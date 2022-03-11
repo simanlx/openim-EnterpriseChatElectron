@@ -17,6 +17,7 @@ enum RequestFunc {
     CREATEFORWARDMESSAGE="CreateForwardMessage",
     CREATEQUOTEMESSAGE="CreateQuoteMessage",
     CREATECARDMESSAGE="CreateCardMessage",
+    CREATEFACEMESSAGE="CreateFaceMessage",
     SENDMESSAGE="SendMessage",
     SENDMESSAGENOTOSS="SendMessageNotOss",
     GETHISTORYMESSAGELIST="GetHistoryMessageList",

@@ -39,6 +39,7 @@ import {
   isRecvParams,
   SearchLocalParams,
   InsertGroupMsgParams,
+  FaceMessageParams,
 } from "../types";
 
 export default class OpenIMSDK extends Emitter {
@@ -328,6 +329,19 @@ export default class OpenIMSDK extends Emitter {
       const _uuid = operationID || uuid(this.uid as string);
       const args = {
         reqFuncName: RequestFunc.CREATEFORWARDMESSAGE,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  };
+
+  createFaceMessage = (data: FaceMessageParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.CREATEFACEMESSAGE,
         operationID: _uuid,
         userID: this.uid,
         data,

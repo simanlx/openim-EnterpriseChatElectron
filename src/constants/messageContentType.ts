@@ -13,6 +13,7 @@ export enum messageTypes {
   HASREADRECEIPTMESSAGE = 112,
   TYPINGMESSAGE = 113,
   QUOTEMESSAGE = 114,
+  FACEMESSAGE = 115,
 }
 
 export enum tipsTypes {

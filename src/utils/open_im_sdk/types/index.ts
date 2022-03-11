@@ -85,6 +85,11 @@ export type MergerMsgParams = {
   summaryList: string[];
 };
 
+export type FaceMessageParams = {
+  index: number;
+  data: string;
+}
+
 export type LocationMsgParams = {
   description: string;
   longitude: number;
