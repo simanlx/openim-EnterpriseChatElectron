@@ -58,12 +58,12 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
   const isPin = () => {
     const options = {
       conversationID: cve.conversationID,
-      isPinned: cve.isPinned,
+      isPinned: !cve.isPinned,
     };
     im.pinConversation(options)
       .then((res) => {
         message.success(!cve.isPinned ? t("PinSuc") : t("CancelPinSuc"));
-        cve.isPinned = !cve.isPinned;
+        // cve.isPinned = !cve.isPinned;
       })
       .catch((err) => {});
   };
