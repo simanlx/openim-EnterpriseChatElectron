@@ -1,12 +1,11 @@
 import { CloseCircleFilled, CloseOutlined } from "@ant-design/icons";
 import { Button, Layout, message } from "antd";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, memo, useEffect, useRef, useState } from "react";
 import { base64toFile, contenteditableDivRange, cosUploadNomal, events, im, isSingleCve, move2end } from "../../../../utils";
 import { messageTypes } from "../../../../constants/messageContentType";
 import { ATSTATEUPDATE, FORWARDANDMERMSG, ISSETDRAFT, MUTILMSG, MUTILMSGCHANGE, REPLAYMSG } from "../../../../constants/events";
 import CardMsgModal from "../components/CardMsgModal";
 import { faceMap } from "../../../../constants/faceType";
-
 import { useSelector, shallowEqual } from "react-redux";
 import { RootState } from "../../../../store";
 import MsgTypeSuffix from "./MsgTypeSuffix";
@@ -44,15 +43,17 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   const groupMemberList = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
   const { t, i18n } = useTranslation();
   const suffixRef = useRef<any>(null);
+  const throttleFlag = useRef(true);
 
   useEffect(() => {
     events.on(REPLAYMSG, replyHandler);
     events.on(MUTILMSG, mutilHandler);
-    window.electron && window.electron.addIpcRendererListener("ScreenshotData",screenshotHandler,"screenshotListener")
+    window.electron && window.electron.addIpcRendererListener("ScreenshotData", screenshotHandler, "screenshotListener");
     return () => {
       events.off(REPLAYMSG, replyHandler);
       events.off(MUTILMSG, mutilHandler);
       window.electron && window.electron.removeIpcRendererListener("screenshotListener");
+      if (timer.current) clearTimeout(timer.current);
     };
   }, []);
 
@@ -83,8 +84,8 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     }
     setMutilMsg([]);
     return () => {
-      setDraft(curCve)
-    }
+      setDraft(curCve);
+    };
   }, [curCve]);
 
   const blobToDataURL = (blob: File, cb: (base64: string) => void) => {
@@ -112,10 +113,10 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     }
   };
 
-  const screenshotHandler = (ev:any,base64:string) => {
+  const screenshotHandler = (ev: any, base64: string) => {
     let img = `<img style="vertical-align:bottom" class="screenshot_el" src="${base64}" alt="" >`;
     setMsgContent(latestContent.current + img);
-  }
+  };
 
   const reParseEmojiFace = (text: string) => {
     faceMap.map((f) => {
@@ -350,12 +351,12 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
 
   const typing = () => {
     if (isSingleCve(curCve)) {
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
+      if (!throttleFlag.current) return;
+      throttleFlag.current = false;
       timer.current = setTimeout(() => {
         updateTypeing(curCve.userID, "yes");
-      }, 2000);
+        throttleFlag.current = true;
+      }, 1000);
     }
   };
 
@@ -439,6 +440,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     let tmpAts: any = [];
     atels.map((at) => tmpAts.push({ id: at.attributes.getNamedItem("data_id")?.value, name: at.attributes.getNamedItem("data_name")?.value, tag: at.outerHTML }));
     setAtList(tmpAts);
+    // typing();
     typing();
   };
 
@@ -453,7 +455,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
             style={{ paddingTop: replyMsg ? "32px" : "4px" }}
             placeholder={`${t("SendTo")} ${curCve.showName}`}
             ref={inputRef}
-            html={msgContent}
+            html={latestContent.current}
             onChange={onChange}
             onKeyDown={keyDown}
             onPaste={textInit}
@@ -467,4 +469,4 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   );
 };
 
-export default CveFooter;
+export default memo(CveFooter, (p, n) => p.curCve.userID === n.curCve.userID && n.curCve.showName === n.curCve.showName);
