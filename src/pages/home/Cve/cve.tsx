@@ -13,14 +13,14 @@ import home_bg from "@/assets/images/home_bg.png";
 import { messageTypes, notOssMessageTypes, SessionType, tipsTypes } from "../../../constants/messageContentType";
 import { useReactive, useRequest } from "ahooks";
 import { CbEvents } from "../../../utils/open_im_sdk";
-import { DELETEMESSAGE, ISSETDRAFT, MERMSGMODAL, MUTILMSG, OPENGROUPMODAL, RESETCVE, REVOKEMSG, SENDFORWARDMSG, TOASSIGNCVE, UPDATEFRIENDCARD } from "../../../constants/events";
+import { DELETEMESSAGE, INSERTTOCURCVE, ISSETDRAFT, MERMSGMODAL, MUTILMSG, OPENGROUPMODAL, RESETCVE, REVOKEMSG, SENDFORWARDMSG, TOASSIGNCVE, UPDATEFRIENDCARD } from "../../../constants/events";
 import { animateScroll } from "react-scroll";
 import MerModal from "./components/MerModal";
-import { SelectType } from "../components/MultipleSelectBox";
 import { getGroupInfo, getGroupMemberList, setGroupMemberList } from "../../../store/actions/contacts";
 import { ConversationItem, FriendItem, GroupItem, GroupMemberItem, MergeElem, MergerMsgParams, MessageItem, PictureElem, WsResponse } from "../../../utils/open_im_sdk/types";
 import { useTranslation } from "react-i18next";
 import { setCurCve } from "../../../store/actions/cve";
+import { SelectType } from "../components/SelectBox";
 
 const { Content } = Layout;
 
@@ -111,12 +111,14 @@ const Home = () => {
     events.on(DELETEMESSAGE, deleteMsg);
     events.on(REVOKEMSG, revokeMyMsgHandler);
     events.on(MERMSGMODAL, merModalHandler);
+    events.on(INSERTTOCURCVE,insertMsgHandler);
     window.electron && window.electron.addIpcRendererListener("DownloadFinish", downloadFinishHandler, "downloadListener");
     return () => {
       events.off(RESETCVE, resetCve);
       events.off(DELETEMESSAGE, deleteMsg);
       events.off(REVOKEMSG, revokeMyMsgHandler);
       events.off(MERMSGMODAL, merModalHandler);
+      events.off(INSERTTOCURCVE,insertMsgHandler);
       window.electron && window.electron.removeIpcRendererListener("downloadListener");
     };
   }, []);
@@ -159,6 +161,10 @@ const Home = () => {
       events.emit(MUTILMSG, false);
     });
   };
+
+  const insertMsgHandler = (message: MessageItem) => {
+    rs.historyMsgList = [message, ...rs.historyMsgList];
+  }
 
   //  im hander
   const newMsgHandler = (data: WsResponse) => {
@@ -227,8 +233,6 @@ const Home = () => {
   };
 
   const resetCve = () => {
-    console.log(2134);
-
     dispatch(setCurCve(null));
   };
 

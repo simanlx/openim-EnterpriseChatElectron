@@ -39,6 +39,11 @@ export enum tipsTypes {
   MEMBERENTER = 1510,
 }
 
+export enum customType {
+  VideoCall = "c100",
+  VoiceCall = "c101",
+}
+
 export const nomalMessageTypes = [
   messageTypes.TEXTMESSAGE,
   messageTypes.ATTEXTMESSAGE,

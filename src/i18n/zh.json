@@ -259,5 +259,17 @@
     "GetUserFailed":"获取用户信息失败！",
     "VideoCall":"视频聊天",
     "VoiceCall":"语音聊天",
-    "CheckAgreement":"请勾选同意协议！"
+    "CheckAgreement":"请勾选同意协议！",
+    "CallVideo":"正在发起视频通话",
+    "CallVoice":"正在发起音频通话",
+    "CalledVideo":"邀请你进行视频通话",
+    "CalledVoice":"邀请你进行音频通话",
+    "GroupCallingVoice":"{{num}}人正在进行语音通话",
+    "GroupCallingVideo":"{{num}}人正在进行视频通话",
+    "Answer":"接听",
+    "HangUp":"挂断",
+    "Microphone":"麦克风",
+    "Camera":"摄像头",
+    "CallVideoTitle":"发起视频通话",
+    "CallVoiceTitle":"发起音频通话"
 }

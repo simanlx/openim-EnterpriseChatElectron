@@ -5,12 +5,15 @@ import { Map, Marker } from "react-amap";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { MERMSGMODAL } from "../../../../../constants/events";
 import { faceMap } from "../../../../../constants/faceType";
-import { messageTypes } from "../../../../../constants/messageContentType";
+import { customType, messageTypes } from "../../../../../constants/messageContentType";
 import { RootState } from "../../../../../store";
 import { formatDate, switchFileIcon, bytesToSize, events, isSingleCve } from "../../../../../utils";
 
 import other_voice from "@/assets/images/voice_other.png";
 import my_voice from "@/assets/images/voice_my.png";
+import my_video_call from "@/assets/images/custom_video_my.png";
+import other_video_call from "@/assets/images/custom_video_other.png";
+import voice_call from "@/assets/images/custom_voice.png";
 import { useTranslation } from "react-i18next";
 import { ConversationItem, MergeElem, MessageItem, PictureElem } from "../../../../../utils/open_im_sdk/types";
 import VideoPlayer from "../../../../../components/VideoPlayer";
@@ -137,6 +140,8 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
   };
 
   const msgType = () => {
+    const isSelfMsg = isSelf(msg.sendID);
+    const imgStyle = isSelfMsg ? { paddingLeft: "4px" } : { paddingRight: "4px" };
     switch (msg.contentType) {
       case messageTypes.TEXTMESSAGE:
         let mstr = msg.content;
@@ -179,8 +184,6 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
           </div>
         );
       case messageTypes.VOICEMESSAGE:
-        const isSelfMsg = isSelf(msg.sendID);
-        const imgStyle = isSelfMsg ? { paddingLeft: "4px" } : { paddingRight: "4px" };
         const imgSrc = isSelfMsg ? my_voice : other_voice;
         return (
           <div style={sty} className={`chat_bg_msg_content_text chat_bg_msg_content_voice ${!isSingle ? "nick_magin" : ""}`}>
@@ -280,10 +283,39 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip("pic_msg_time")}
           </div>
         );
+      case messageTypes.CUSTOMMESSAGE:
+        const customEl = msg.customElem;
+        const customData = JSON.parse(customEl.data)
+        const callIcon = customData.type === customType.VideoCall ? isSelfMsg ?my_video_call : other_video_call :voice_call
+        const callStr = switchCallStatus(customData.status) + " " +  customData.duration
+        return (
+          <div style={sty} className={`chat_bg_msg_content_text chat_bg_msg_content_voice ${!isSingle ? "nick_magin" : ""}`}>
+            <div style={{ flexDirection: isSelfMsg ? "row-reverse" : "row" }} onClick={() => {}}>
+              <img style={imgStyle} src={callIcon} alt="" />
+              {callStr}
+            </div>
+            {timeTip()}
+          </div>
+        );
       default:
         return <div className={`chat_bg_msg_content_text ${!isSingle ? "nick_magin" : ""}`}>{t("UnsupportedMessage")}</div>;
     }
   };
+
+  const switchCallStatus = (status: string) => {
+    switch (status) {
+      case "success":
+        return "通话时长"
+      case "cancel":
+        return "已取消"
+      case "canceled":
+        return "已被取消"
+      case "refuse":
+        return "已拒绝"
+      case "refused":
+        return "已被拒绝"
+    }
+  }
 
   return msgType();
 };

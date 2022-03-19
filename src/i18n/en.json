@@ -259,5 +259,17 @@
     "GetUserFailed":"Failed to get user information!",
     "VideoCall":"Video Call",
     "VoiceCall":"Voice Call",
-    "CheckAgreement":"Please check agree agreement!"
+    "CheckAgreement":"Please check agree agreement!",
+    "CallVideo":"Initiating a video call",
+    "CallVoice":"Initiating a audio call",
+    "CalledVideo":"Invite you on a video call",
+    "CalledVoice":"Invite you on a audio call",
+    "GroupCallingVoice":"{{num}} people are on a audio call",
+    "GroupCallingVideo":"{{num}} people are on a video call",
+    "Answer":"Answer",
+    "HangUp":"HangUp",
+    "Microphone":"Mic",
+    "Camera":"Camera",
+    "CallVideoTitle":"Initiating a video call",
+    "CallVoiceTitle":"Initiating a audio call"
 }

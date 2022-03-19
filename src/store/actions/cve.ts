@@ -30,7 +30,8 @@ export const getCveList = () => {
         dispatch(setCveInitLoading(true))
         im.getAllConversationList()
         .then(res=>{
-          // console.log(JSON.parse(res.data));
+          console.log(JSON.parse(res.data));
+          
             dispatch(setCveList(JSON.parse(res.data)))
             dispatch(setCveInitLoading(false))
         })

@@ -1,15 +1,22 @@
-export const AXIOSURL = "http://121.37.25.71:42233"
-export const IMURL = "ws://121.37.25.71:30000"
-export const ADMINURL = "http://121.37.25.71:10000"
+// export const AXIOSURL = "http://121.37.25.71:42233"
+// export const IMURL = "ws://121.37.25.71:30000"
+// export const ADMINURL = "http://121.37.25.71:10000"
 
 // export const AXIOSURL = "http://43.128.5.63:42233"
 // export const IMURL = "ws://43.128.5.63:30000"
 // export const ADMINURL = "http://43.128.5.63:10000"
 
-export const AXIOSTIMEOUT = 60000
-// export const IMURL = "ws://172.16.8.136:30000"
+
+// export const AXIOSURL = "http://43.128.5.63:42233"
 // export const IMURL = "ws://172.16.9.247:30000"
-// export const IMURL = "ws://172.16.8.136:30000"
+// export const ADMINURL = "http://43.128.5.63:10000"
+
+export const AXIOSURL = "https://open-im-online.rentsoft.cn"
+export const IMURL = "wss://open-im-online.rentsoft.cn/wss"
+export const ADMINURL = "https://open-im-online.rentsoft.cn"
+
+export const AXIOSTIMEOUT = 60000
+
 export const PICMESSAGETHUMOPTION = "?imageView2/1/w/200/h/200/rq/80"
 export const LANGUAGE = "zh-cn"
 

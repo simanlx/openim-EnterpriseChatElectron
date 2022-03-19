@@ -6,9 +6,9 @@ import ContactList from "../../../components/ContactList";
 import { APPLICATIONTYPEUPDATE, CLEARSEARCHINPUT, TOASSIGNCVE } from "../../../constants/events";
 import { SessionType } from "../../../constants/messageContentType";
 import { RootState } from "../../../store";
-import { setGroupMemberLoading } from "../../../store/actions/contacts";
+import { getOriginInfoList, setGroupMemberLoading } from "../../../store/actions/contacts";
 import { events } from "../../../utils";
-import { FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem } from "../../../utils/open_im_sdk/types";
+import { FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem, PublicUserItem } from "../../../utils/open_im_sdk/types";
 import { MenuItem } from "./ContactMenuList";
 import GroupList from "./GroupList";
 import NewNotice from "./NewNotice";
@@ -23,6 +23,7 @@ export type ContactContentHandler = {
 
 const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactContentProps> = ({ menu }, ref) => {
   const friendList = useSelector((state: RootState) => state.contacts.friendList, shallowEqual);
+  const originList = useSelector((state: RootState) => state.contacts.originList, shallowEqual);
   const groupList = useSelector((state: RootState) => state.contacts.groupList, shallowEqual);
   const recvFriendApplicationList = useSelector((state: RootState) => state.contacts.recvFriendApplicationList, shallowEqual);
   const sentFriendApplicationList = useSelector((state: RootState) => state.contacts.sentFriendApplicationList, shallowEqual);
@@ -80,6 +81,9 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
     setSearchFlag(true);
     switch (idx) {
       case 0:
+        const originFields = ["nickname", "userID"];
+        searchTemplate(value, originFields, originList.info);
+        break;
       case 3:
         const friendFields = ["nickname", "remark", "userID"];
         searchTemplate(value, friendFields, friendList);
@@ -109,6 +113,14 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
     }
   };
 
+  const fetchMoreRegisters = () => {
+    const totalIDs = originList.id.length
+    const nextLength = originList.current+20
+    const nextIDs = originList.id.slice(originList.current,nextLength>totalIDs?totalIDs:nextLength)
+    
+    dispatch(getOriginInfoList(nextIDs,originList.current+20,[...originList.info]) as any)
+  }
+
   useImperativeHandle(ref, () => {
     return {
       searchCb,
@@ -133,6 +145,8 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
         }
         return <NewNotice type={menu.idx} renderType={renderType} renderList={searchFlag ? contacts : tmpList} />;
       case 0:
+        const hasMore = originList.current < originList.id.length
+        return <ContactList hasMore={hasMore} fetchMoreData={fetchMoreRegisters} clickItem={clickListItem} contactList={searchFlag ? (contacts as PublicUserItem[]) : originList.info} />;
       case 3:
         return <ContactList clickItem={clickListItem} contactList={searchFlag ? (contacts as FriendItem[]) : friendList} />;
       case 4:

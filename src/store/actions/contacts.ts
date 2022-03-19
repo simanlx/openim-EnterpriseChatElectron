@@ -1,7 +1,8 @@
 import { Dispatch } from "redux";
 import { MemberMapType } from "../../@types/open_im";
+import { getRegisters } from "../../api/admin";
 import { im } from "../../utils";
-import { BlackItem, FriendApplicationItem, FriendItem, GetGroupMemberParams, GroupApplicationItem, GroupItem, GroupMemberItem, TotalUserStruct } from "../../utils/open_im_sdk/types";
+import { BlackItem, FriendApplicationItem, FriendItem, GetGroupMemberParams, GroupApplicationItem, GroupItem, GroupMemberItem, PublicUserItem, TotalUserStruct } from "../../utils/open_im_sdk/types";
 import {
   ContactActionTypes,
   SET_BLACK_LIST,
@@ -17,6 +18,7 @@ import {
   SET_ORIGIN_LIST,
   SET_UNREAD_COUNT,
   SET_GROUP_INFO,
+  OriginListType,
 } from "../types/contacts";
 
 export const setFriendList = (value: FriendItem[]): ContactActionTypes => {
@@ -26,7 +28,7 @@ export const setFriendList = (value: FriendItem[]): ContactActionTypes => {
   };
 };
 
-export const setOriginList = (value: FriendItem[]): ContactActionTypes => {
+export const setOriginList = (value: Partial<OriginListType>): ContactActionTypes => {
   return {
     type: SET_ORIGIN_LIST,
     payload: value,
@@ -107,6 +109,26 @@ export const setUnReadCount = (value: number): ContactActionTypes => {
   return {
     type: SET_UNREAD_COUNT,
     payload: value,
+  };
+};
+
+export const getOriginIDList = (token:string) => {
+  return (dispatch: Dispatch) => {
+    getRegisters(token).then(res=>{
+      dispatch(setOriginList({id: res.data}))
+      dispatch(getOriginInfoList(res.data.slice(0,20),20) as any)
+    })
+  };
+};
+
+export const getOriginInfoList = (userIDList:string[],current:number,oldList:PublicUserItem[]=[]) => {
+  return (dispatch: Dispatch) => {
+    dispatch(setOriginList({loading:false}))
+    im.getUsersInfo(userIDList).then((res) => {
+      let info:PublicUserItem[] = []
+      JSON.parse(res.data).forEach((item:TotalUserStruct)=>info.push(item.publicInfo!))
+      dispatch(setOriginList({info:[...oldList,...info],current,loading:false}))
+    });
   };
 };
 

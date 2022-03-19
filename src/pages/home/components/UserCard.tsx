@@ -109,7 +109,6 @@ const UserCard: FC<UserCardProps> = ({ draggableCardVisible, info, close, type }
   const updateSelfInfo = () => {
     im.setSelfInfo(selfInfo)
       .then((res) => {
-        dispatch(getSelfInfo());
         message.success(t("ModifySuc"));
       })
       .catch((err) => message.error(t("ModifyFailed")));

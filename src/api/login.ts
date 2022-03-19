@@ -17,13 +17,6 @@ export const modify = (phoneNumber: string, verificationCode: string, newPasswor
   request.post("/auth/reset_password", JSON.stringify({ phoneNumber, verificationCode, newPassword, platform: 5, operationID: Date.now() + "" }));
 
 export const login = (phoneNumber: string, password: string) => {
-  let platform = 5;
-  // if(window.electron){
-  //     if(window.process.platform==="darwin"){
-  //       platform = 4
-  //     }else if(window.process.platform==="win32"){
-  //       platform = 3
-  //     }
-  //   }
+  let platform = window.electron ? window.electron.platform : 5
   return request.post("/auth/login", JSON.stringify({ phoneNumber, password, platform, operationID: Date.now() + "" }));
 };
