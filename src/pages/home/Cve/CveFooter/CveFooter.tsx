@@ -327,14 +327,11 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     mstr = mstr.replaceAll("<br>", "\n");
     return mstr;
   };
-
+  // console.log(curCve);
   const sendTextMsg = async (text: string) => {
     const { data } = await im.createTextMessage(text);
-    // im.insertGroupMessageToLocalStorage({
-    //   message: data,
-    //   groupID: curCve.groupID,
-    //   sendID: "17396220460",
-    // }).then((res) => console.log(JSON.parse(res.data)));
+    // console.log(curCve);
+
     sendMsg(data, messageTypes.TEXTMESSAGE);
     reSet();
   };
@@ -469,4 +466,10 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   );
 };
 
-export default memo(CveFooter, (p, n) => p.curCve.userID === n.curCve.userID && n.curCve.showName === n.curCve.showName);
+export default memo(
+  CveFooter,
+  (p, n) =>
+    (p.curCve.userID !== "" && p.curCve.userID === n.curCve.userID) ||
+    (p.curCve.groupID !== "" && p.curCve.groupID === n.curCve.groupID) ||
+    (p.curCve.conversationType === n.curCve.conversationType && p.curCve.showName === n.curCve.showName)
+);
