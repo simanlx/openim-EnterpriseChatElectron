@@ -38,6 +38,8 @@ const Login = () => {
   const { value: type, setValue: setType, back } = useHistoryTravel<Itype>("login");
   const lastType = useLatest(type);
 
+  
+
   const finish = (values?: FormField | string | InfoField) => {
     switch (lastType.current) {
       case "login":
@@ -140,6 +142,23 @@ const Login = () => {
     //pc
     localStorage.setItem(`lastimuid`, userID);
 
+    if (!localStorage.getItem('userEmoji')) {
+      localStorage.setItem('userEmoji', JSON.stringify([]))
+    }
+    const userEmojiInfo = {
+      userID,
+      emoji: [],
+    }
+    const allUserEmoji = JSON.parse(localStorage.getItem('userEmoji')!)
+    const flag = allUserEmoji.some((item: any) => item?.userID === userID)
+    if (!flag) {
+      localStorage.setItem('userEmoji', JSON.stringify([
+        ...allUserEmoji,
+        userEmojiInfo
+      ]))
+    }
+    
+    
     let url = getIMUrl();
     let platformID = 5;
     if (window.electron) {

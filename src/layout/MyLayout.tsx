@@ -16,7 +16,6 @@ type LayoutProps = {
 const Mylayout: FC<LayoutProps> = (props) => {
   const selectValue = (state: RootState) => state.user.selfInfo;
   const userInfo = useSelector(selectValue, shallowEqual);
-
   return (
     <Layout style={{ height: "100vh", maxHeight: "100vh" }}>
       {window.electron && <TopBar />}

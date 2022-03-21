@@ -1,6 +1,6 @@
-import { PlusCircleOutlined, SmileOutlined } from "@ant-design/icons";
+import { CrownOutlined, PlusCircleOutlined, PlusOutlined, SmileOutlined } from "@ant-design/icons";
 import { Dropdown, Menu, message,Image as AntdImage } from "antd";
-import { FC, forwardRef, useImperativeHandle } from "react";
+import { FC, forwardRef, useImperativeHandle, useState } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { cosUpload, getPicInfo, getVideoInfo, im } from "../../../../utils";
 import Upload, { RcFile } from "antd/lib/upload";
@@ -22,6 +22,10 @@ type MsgTypeSuffixProps = {
 
 const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref) => {
   const { t } = useTranslation();
+
+  const [expressionStyle, setExpressionStyle] = useState(1) // 1--显示表情符号 2--显示表情包
+  const [visibleValue, setVisibleValue] = useState(false)
+  const [emojiMap, setEmojiMap] = useState([])
 
   const imgMsg = async (file: RcFile, url: string) => {
     const { width, height } = await getPicInfo(file);
@@ -104,6 +108,65 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
       })
       .catch((err) => message.error(t("UploadFailed")));
   };
+
+  const changeEmojiStyle = (style: any) => {
+    switch (style) {
+      case 1:
+        setExpressionStyle(1)
+        setVisibleValue(true)
+        break;
+      default:
+        setExpressionStyle(2)
+        setVisibleValue(true)
+        const emojiStorage = JSON.parse(localStorage.getItem('userEmoji')!) // 获取本地表情包
+        const userId = JSON.parse(localStorage.getItem('lastimuid')!) // 获取当前用户ID
+        // 获取当前用户的表情包
+        const emojis = emojiStorage.filter((item: any) => {
+          return item.userID === String(userId)
+        })
+        setEmojiMap(emojis[0].emoji)
+        break;
+    }
+  }
+
+  const handleVisibleChange = (flag: any) => {
+    setVisibleValue(flag)
+    if (flag) {
+      setExpressionStyle(1)
+    }
+  }
+
+  const uploadIcon = async (uploadData: UploadRequestOption) => {
+    await getCosAuthorization();
+    cosUpload(uploadData)
+      .then((res) => {
+        // rs.groupIcon = res.url;
+        // console.log(res.url)
+        const userEmoji = JSON.parse(localStorage.getItem('userEmoji')!)
+        const userId = JSON.parse(localStorage.getItem('lastimuid')!)
+        const emojiObj = userEmoji.filter((item: any) => {
+          return item.userID === String(userId)
+        })
+        const otherUserEmoji = userEmoji.filter((item: any) => {
+          return item.userID !== String(userId)
+        })
+        console.log(emojiObj)
+        emojiObj[0].emoji = [
+          res.url,
+          ...emojiObj[0].emoji
+        ]
+        const allUserEmoji = [
+          {
+            userID: String(userId),
+            emoji: emojiObj[0].emoji
+          },
+          ...otherUserEmoji
+        ]
+        localStorage.setItem('userEmoji', JSON.stringify(allUserEmoji))
+      })
+      .catch((err) => message.error(t("UploadFailed")));
+  };
+
   
   const menus = [
     {
@@ -138,11 +201,42 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
 
   const FaceType = () => (
     <div style={{ boxShadow: "0px 4px 25px rgb(0 0 0 / 16%)" }} className="face_container">
-      {faceMap.map((face) => (
-        <div key={face.context} onClick={() => faceClick(face)} className="face_item">
-          <AntdImage preview={false} width={24} src={face.src} />
-        </div>
-      ))}
+      {
+        expressionStyle === 1
+        ? <div className="face_container_emoji">
+            {faceMap.map((face) => (
+              <div key={face.context} onClick={() => faceClick(face)} className="face_item">
+                <AntdImage preview={false} width={24} src={face.src} />
+              </div>
+            ))}
+          </div>
+        : <div className="face_container_emoji">
+          <Upload accept="image/*" action={""} customRequest={(data) => uploadIcon(data)} showUploadList={false}>
+            <span className="upload">
+              <div>
+                <PlusOutlined style={{fontSize: '35px'}} />
+              </div>
+            </span>
+          </Upload>
+          {emojiMap?.map((face: any, index) => (
+              <div key={index} onClick={() => faceClick(face)} className="emoji_item">
+                <AntdImage preview={false} style={{borderRadius: '5px'}} height={50} width={50} src={face} />
+              </div>
+            ))}
+          </div>
+      }
+      
+      <hr style={{margin: 0,opacity: '.3'}}></hr>
+      <div className="expression_style">
+        <span
+        style={expressionStyle === 1 ? { backgroundColor: 'rgb(229 231 235)'} : { backgroundColor: ''}}
+        onClick={() => changeEmojiStyle(1)}
+        ><SmileOutlined style={{fontSize: '16px',color: '#428BE5'}} /></span>
+        <span
+        style={expressionStyle !== 1 ? { backgroundColor: 'rgb(229 231 235)'} : { backgroundColor: ''}}
+        onClick={() => changeEmojiStyle(2)}
+        ><CrownOutlined style={{fontSize: '16px',color: '#428BE5'}} /></span>
+      </div>
     </div>
   );
 
@@ -189,9 +283,15 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
 
   return (
     <div className="suffix_container">
-      <Dropdown overlayClassName="face_type_drop" overlay={FaceType} placement="topRight" arrow>
+      <Dropdown
+      visible={visibleValue}
+      onVisibleChange={handleVisibleChange}
+      overlayClassName="face_type_drop"
+      overlay={FaceType}
+      placement="topRight"
+      arrow>
         {/* <Tooltip title="表情"> */}
-        <SmileOutlined style={{ paddingRight: "8px" }} />
+        <SmileOutlined style={{ marginRight: "8px" }} />
         {/* </Tooltip> */}
       </Dropdown>
 

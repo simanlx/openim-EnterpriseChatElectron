@@ -9,6 +9,7 @@ import sh_msg from "@/assets/images/sh_msg.png";
 import del_msg from "@/assets/images/del_msg.png";
 import cp_msg from "@/assets/images/cp_msg.png";
 import download_msg from "@/assets/images/download_msg.png";
+import add_msg from "@/assets/images/add_msg.png";
 import { downloadFileUtil, events, im } from "../../../../../utils";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { FORWARDANDMERMSG, MUTILMSG, REPLAYMSG, REVOKEMSG, DELETEMESSAGE } from "../../../../../constants/events";
@@ -18,6 +19,7 @@ import { MessageItem } from "../../../../../utils/open_im_sdk/types";
 
 const canCpTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE];
 const canDownloadTypes = [messageTypes.PICTUREMESSAGE, messageTypes.VIDEOMESSAGE, messageTypes.FILEMESSAGE];
+const canAddTypes = [messageTypes.PICTUREMESSAGE]
 
 type MsgMenuProps = {
   visible: boolean;
@@ -91,6 +93,31 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
     downloadFileUtil(downloadUrl, fileName);
   };
 
+  const addMsg = () => {
+    const userEmoji = JSON.parse(localStorage.getItem('userEmoji')!)
+    const userId = JSON.parse(localStorage.getItem('lastimuid')!)
+    const emojiObj = userEmoji.filter((item: any) => {
+      return item.userID === String(userId)
+    })
+    const otherUserEmoji = userEmoji.filter((item: any) => {
+      return item.userID !== String(userId)
+    })
+    console.log(emojiObj)
+    emojiObj[0].emoji = [
+      msg.pictureElem.sourcePicture.url,
+      ...emojiObj[0].emoji
+    ]
+    const allUserEmoji = [
+      {
+        userID: String(userId),
+        emoji: emojiObj[0].emoji
+      },
+      ...otherUserEmoji
+    ]
+    localStorage.setItem('userEmoji', JSON.stringify(allUserEmoji))
+    message.success(t('AddMsgSuccess'))
+  }
+
   const menus = [
     // {
     //   title: t("Translate"),
@@ -98,6 +125,12 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
     //   method: () => {},
     //   hidden: false,
     // },
+    {
+      title: t("AddMsg"),
+      icon: add_msg,
+      method: addMsg,
+      hidden: false,
+    },
     {
       title: t("Forward"),
       icon: sh_msg,
@@ -154,6 +187,10 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
     if (!isSelf && menu.title === t("Revoke")) {
       menu.hidden = true;
     }
+
+    if (menu.title === t("AddMsg") && !canAddTypes.includes(msg.contentType)) {
+      menu.hidden = true;
+    }
     return menu.hidden ? null : menu.title === t("Copy") ? (
       <CopyToClipboard key={menu.title} onCopy={() => message.success("复制成功！")} text={msg.contentType === messageTypes.ATTEXTMESSAGE ? msg.atElem.text : msg.content}>
         <div onClick={menu.method} className="msg_menu_iem">
@@ -163,7 +200,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
       </CopyToClipboard>
     ) : (
       <div key={menu.title} onClick={menu.method} className="msg_menu_iem">
-        <img src={menu.icon} />
+        <img src={menu.icon} style={{width: '12px',height: '12px'}} alt= '' />
         <span>{menu.title}</span>
       </div>
     );
@@ -174,7 +211,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
   };
 
   return (
-    <Popover onVisibleChange={(v) => visibleChange(v)} overlayClassName="msg_item_menu" content={PopContent} title={null} trigger="contextMenu" visible={visible}>
+    <Popover  onVisibleChange={(v) => visibleChange(v)} overlayClassName="msg_item_menu" content={PopContent} title={null} trigger="contextMenu" visible={visible}>
       <div>{children}</div>
     </Popover>
   );

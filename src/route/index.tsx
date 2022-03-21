@@ -4,6 +4,7 @@ import Login from "../pages/login/Login";
 import Home from "../pages/home/Cve/cve";
 import Contacts from "../pages/home/Contact/contacts";
 import Profile from "../pages/home/Profile/Profile";
+import Workbench from "../pages/home/Workbench/Workbench";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { RootState } from "../store";
@@ -37,6 +38,7 @@ import { CbEvents } from "../utils/open_im_sdk";
 import { ConversationItem, FriendApplicationItem, GroupApplicationItem, WsResponse } from "../utils/open_im_sdk/types";
 import { OPENSINGLEMODAL } from "../constants/events";
 import { cveSort } from "../utils";
+import TogetherSend from "../pages/home/TogetherSend/TogetherSend";
 
 type GruopHandlerType = "added" | "deleted" | "info" | "memberAdded" | "memberDeleted";
 
@@ -463,6 +465,8 @@ const MyRoute = () => {
           <Route index element={<Home />} />
           <Route path="contacts" element={<Contacts />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="workbench" element={<Workbench/>} />
+          <Route path="togetherSend" element={<TogetherSend />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

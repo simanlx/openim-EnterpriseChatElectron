@@ -4,8 +4,12 @@ import styles from "./layout.module.less";
 
 import cve from "@/assets/images/cve.png";
 import cve_select from "@/assets/images/cve_select.png";
+import workbench from "@/assets/images/workbench.png";
+import workbench_select from "@/assets/images/workbench_select.png";
 import cons from "@/assets/images/cons.png";
 import cons_select from "@/assets/images/cons_select.png";
+import togetherSend from "@/assets/images/togetherSend.png";
+import togetherSend_select from "@/assets/images/togetherSend_select.png";
 import { useResolvedPath, useMatch, useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { FC, useEffect, useRef, useState } from "react";
@@ -155,20 +159,35 @@ const ToolsBar: FC<ToolsBarProps> = ({ userInfo }) => {
       path: "/contacts",
       idx: 1,
     },
+    {
+      tip: t("Workbench"),
+      icon: workbench,
+      icon_select: workbench_select,
+      path: "/workbench",
+      idx: 2,
+    },
+    {
+      tip: t("TogetherSend"),
+      icon: togetherSend,
+      icon_select: togetherSend_select,
+      path: "/togetherSend",
+      idx: 3,
+    },
   ];
 
   const logout = () => {
     im.logout();
-    const IMUrl = getIMUrl();
-    const IMAxiosUrl = getAxiosUrl();
-    const IMAdminUrl = getAdminUrl();
-    const LastUid = localStorage.getItem("lastimuid")
-    localStorage.clear();
-    localStorage.setItem("IMAxiosUrl",IMAxiosUrl);
-    localStorage.setItem("IMUrl",IMUrl);
-    localStorage.setItem("IMAdminUrl",IMAdminUrl);
-    localStorage.setItem("IMAdminUrl",IMAdminUrl);
-    localStorage.setItem("lastimuid",LastUid!);
+    // const IMUrl = getIMUrl();
+    // const IMAxiosUrl = getAxiosUrl();
+    // const IMAdminUrl = getAdminUrl();
+    // const LastUid = localStorage.getItem("lastimuid")
+    // localStorage.clear();
+    localStorage.removeItem('improfile')
+    // localStorage.setItem("IMAxiosUrl",IMAxiosUrl);
+    // localStorage.setItem("IMUrl",IMUrl);
+    // localStorage.setItem("IMAdminUrl",IMAdminUrl);
+    // localStorage.setItem("IMAdminUrl",IMAdminUrl);
+    // localStorage.setItem("lastimuid",LastUid!);
     navigate("/login");
   };
 

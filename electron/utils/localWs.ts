@@ -9,7 +9,7 @@ const appPath = app.getAppPath();
 const userDataPath = app.getPath("userData");
 const dbDataPath = `${userDataPath}/db`;
 
-let localWs: ChildProcessWithoutNullStreams;
+let localWs:ChildProcessWithoutNullStreams;
 
 const checkDir = () => {
   return new Promise<void>((resolve, reject) => {
@@ -28,22 +28,14 @@ const checkDir = () => {
 export const initLocalWs = async () => {
   await checkDir();
   let exeType = "";
-  switch (platform) {
-    case "win32":
-      exeType = "localWs_win.exe";
-      break;
-    case "darwin":
-      exeType = "localWs_mac";
-      break;
-    case "linux":
-      exeType = "localWs_linux_arm";
-      break;
-    default:
-      break;
+  if (platform === "darwin") {
+    exeType = "localWs_mac";
+  } else if (platform === "win32") {
+    exeType = "localWs_win.exe";
   }
   const exPath = isDev ? `${__dirname}/../../../electron/exec/${exeType}` : `${appPath}/../exec/${exeType}`;
   const dbDir = isDev ? "./" : dbDataPath;
-
+  
   localWs = spawn(exPath, ["-openIMApiAddress", getApiAddress(), "-openIMWsAddress", getWsAddress(), "-sdkWsPort", getWsPort(), "-openIMDbDir", dbDir]);
 
   localWs.stdout.on("data", (data: Buffer) => {
@@ -57,7 +49,7 @@ export const initLocalWs = async () => {
   localWs.on("close", (code: number) => {
     console.log("close:::::");
     setTimeout(() => {
-      if (getAppStatus()) {
+      if(getAppStatus()){
         localWs = spawn(exPath, ["-openIMApiAddress", getApiAddress(), "-openIMWsAddress", getWsAddress(), "-sdkWsPort", getWsPort(), "-openIMDbDir", dbDir]);
       }
     }, 2000);
@@ -65,7 +57,8 @@ export const initLocalWs = async () => {
 };
 
 export const killLocalWs = () => {
-  if (localWs && !localWs.killed) {
+  
+  if(localWs&&!localWs.killed){
     localWs.kill();
   }
-};
+}

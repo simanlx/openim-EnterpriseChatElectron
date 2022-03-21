@@ -30,6 +30,11 @@ const SingleDrawer: FC<SingleDrawerProps> = ({ curCve, updateOpt, updatePin }) =
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
+  //
+  const look = useSelector((state: RootState) => state.contacts, shallowEqual)
+  console.log(look)
+  console.log(curCve)
+
   useEffect(() => {
     let flag = 0;
     if (friendList.find((item) => item.userID === curCve?.userID)) {
@@ -49,6 +54,22 @@ const SingleDrawer: FC<SingleDrawerProps> = ({ curCve, updateOpt, updatePin }) =
       im.removeBlack(curCve?.userID!).catch((err) => message.error(t("RemoveBlackFailed")));
     }
   };
+
+  const readLimit = (e: boolean) => {
+    if (e) {
+      console.log('开启阅后即焚')
+    } else {
+      console.log('关闭阅后即焚')
+    }
+  }
+
+  const blockFriend = (e: boolean) => {
+    if (e) {
+      console.log('开启屏蔽该好友')
+    } else {
+      console.log('关闭屏蔽该好友')
+    }
+  }
 
   const delFriend = () => {
     im.deleteFriend(curCve.userID)
@@ -113,12 +134,20 @@ const SingleDrawer: FC<SingleDrawerProps> = ({ curCve, updateOpt, updatePin }) =
         <Switch checked={curCve.isPinned} size="small" onChange={updatePin} />
       </div>
       <div className="single_drawer_item">
+        <div>{t("ReadTimeLimit")}</div>
+        <Switch size="small"  onChange={(e) => readLimit(e)} />
+      </div>
+      <div className="single_drawer_item">
         <div>{t("AddBlack")}</div>
         <Switch size="small" checked={ship === ShipType.Black} onChange={(e) => blackListChnage(e)} />
       </div>
       <div className="single_drawer_item">
         <div>{t("NotDisturb")}</div>
         <Switch checked={curCve.recvMsgOpt !== OptType.Nomal} size="small" onChange={updateOpt} />
+      </div>
+      <div className="single_drawer_item">
+        <div>{t("BlockThisFriend")}</div>
+        <Switch size="small" onChange={(e) => blockFriend(e)} />
       </div>
       {ship === ShipType.Friend && (
         <Button onClick={delFriend} danger className="single_drawer_btn">

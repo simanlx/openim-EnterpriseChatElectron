@@ -7,6 +7,7 @@ import my_group from "@/assets/images/my_group.png";
 import new_friend from "@/assets/images/new_friend.png";
 import new_group from "@/assets/images/new_group.png";
 import nomal_cons from "@/assets/images/nomal_cons.png";
+import label_icon from "@/assets/images/label_icon.png";
 import { RootState } from "../../../store";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import HomeHeader from "../components/HomeHeader";
@@ -58,6 +59,13 @@ const Contacts = () => {
       bgc: "#53D39C",
       idx: 4,
       suffix: "mg",
+    },
+    {
+      title: t("Label"),
+      icon: label_icon,
+      bgc: "#428BE5",
+      idx: 5,
+      suffix: "lb",
     },
   ];
   const [menu, setMenu] = useState(consMenuList[3]);

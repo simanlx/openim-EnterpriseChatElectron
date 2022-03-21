@@ -9,7 +9,7 @@ import right_notice from "@/assets/images/right_notice.png";
 import right_notice_se from "@/assets/images/right_notice_se.png";
 import { FC, useEffect, useState } from "react";
 import { events, isSingleCve } from "../../../utils";
-import { TOASSIGNCVE } from "../../../constants/events";
+import { CLOSERIGHTDRAWER, TOASSIGNCVE } from "../../../constants/events";
 import CveRightDrawer from "./CveRightDrawer/CveRightDrawer";
 import { useTranslation } from "react-i18next";
 import { ConversationItem, FriendItem } from "../../../utils/open_im_sdk/types";
@@ -27,8 +27,10 @@ const CveRightBar: FC<CveRightBarProps> = ({ curCve }) => {
 
   useEffect(() => {
     events.on(TOASSIGNCVE, assignHandler);
+    events.on(CLOSERIGHTDRAWER, onClose);
     return () => {
       events.off(TOASSIGNCVE, assignHandler);
+      events.on(CLOSERIGHTDRAWER, onClose);
     };
   }, []);
 

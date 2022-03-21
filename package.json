@@ -39,7 +39,7 @@
     "start:renderer": "craco start",
     "build:renderer": "craco build",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "build:main": "craco build && tsc -p electron && electron-builder --linux --arm64",
+    "build:main": "craco build && tsc -p electron && electron-builder --macos --win",
     "test": "craco test",
     "eject": "react-scripts eject",
     "el": "electron .",
@@ -104,10 +104,7 @@
     "react-error-overlay": "6.0.9"
   },
   "main": "build/electron/main.js",
-  "homepage": "./",
-  "author":"blooming",
-  "description":"Open IM",
-  "email":"blooming2477@gmail.com",
+  "homepage": ".",
   "build": {
     "extends": null,
     "files": [
@@ -120,11 +117,6 @@
     "mac": {
       "target": "dmg",
       "icon": "./build/icons/logo512x512.png"
-    },
-    "linux": {
-      "icon": "./build/icons/logo512x512.png",
-      "target": "deb",
-      "maintainer":"openim"
     },
     "nsis": {
       "oneClick": false,

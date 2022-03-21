@@ -11,6 +11,7 @@ import { events } from "../../../utils";
 import { FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem } from "../../../utils/open_im_sdk/types";
 import { MenuItem } from "./ContactMenuList";
 import GroupList from "./GroupList";
+import LabelList from "./LabelList";
 import NewNotice from "./NewNotice";
 
 type ContactContentProps = {
@@ -106,6 +107,10 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
         const groupFields = ["groupName", "groupID"];
         searchTemplate(value, groupFields, groupList);
         break;
+      // case 5:
+      //   const groupFields = ["groupName", "groupID"];
+      //   searchTemplate(value, groupFields, groupList);
+      //   break;
     }
   };
 
@@ -137,6 +142,8 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
         return <ContactList clickItem={clickListItem} contactList={searchFlag ? (contacts as FriendItem[]) : friendList} />;
       case 4:
         return <GroupList groupList={searchFlag ? (contacts as GroupItem[]) : groupList} clickItem={clickListItem} />;
+      case 5:
+        return <LabelList />;
       default:
         return null;
     }

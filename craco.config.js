@@ -1,6 +1,6 @@
 const CracoLessPlugin = require("craco-less");
 const path = require("path");
-const { whenProd, getPlugin, pluginByName } = require("@craco/craco");
+const { whenProd,getPlugin,pluginByName } = require("@craco/craco");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
@@ -53,7 +53,7 @@ module.exports = {
     //       react: "React",
     //       "react-dom": "ReactDOM",
     //       redux: "Redux",
-    //       "video.js": "videojs",
+    //       "video.js":"videojs"
     //     };
 
     //     cdn = {
@@ -63,17 +63,15 @@ module.exports = {
     //         "https://cdn.bootcdn.net/ajax/libs/redux/4.1.0/redux.min.js",
     //         "https://unpkg.com/video.js@7.10.2/dist/video.min.js",
     //       ],
-    //       css: ["https://unpkg.com/video.js@7.10.2/dist/video-js.min.css"],
+    //       css: [
+    //         "https://unpkg.com/video.js@7.10.2/dist/video-js.min.css"
+    //       ],
     //     };
 
     //     const { isFound, match } = getPlugin(webpackConfig, pluginByName("HtmlWebpackPlugin"));
     //     if (isFound) {
     //       match.options.cdn = cdn;
     //     }
-    //     webpackConfig.output = {
-    //       ...webpackConfig.output,
-    //       publicPath: "./",
-    //     };
     //   }
     //   return webpackConfig;
     // },
