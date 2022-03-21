@@ -38,12 +38,9 @@ import { CbEvents } from "../utils/open_im_sdk";
 import { ConversationItem, FriendApplicationItem, GroupApplicationItem, RtcInvite, WsResponse } from "../utils/open_im_sdk/types";
 import { OPENSINGLEMODAL, SIGNALINGINVITE } from "../constants/events";
 import { cveSort } from "../utils";
-<<<<<<< HEAD
 import TogetherSend from "../pages/home/TogetherSend/TogetherSend";
-=======
 import RtcModal, { RtcModalProps } from "../pages/home/Rtc/RtcModal";
 import { SessionType } from "../constants/messageContentType";
->>>>>>> ee04266b9f7047054b94fd98ad0e5a9c30bd0ef0
 
 type GruopHandlerType = "added" | "deleted" | "info" | "memberAdded" | "memberDeleted";
 

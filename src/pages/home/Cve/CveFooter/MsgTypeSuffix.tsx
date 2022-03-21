@@ -295,7 +295,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
         {/* </Tooltip> */}
       </Dropdown>
 
-      <Dropdown overlayClassName="msg_type_drop" overlay={MsgType} placement="topCenter" arrow>
+      <Dropdown overlayClassName="msg_type_drop" overlay={MsgType} placement="top" arrow>
         <PlusCircleOutlined />
       </Dropdown>
     </div>

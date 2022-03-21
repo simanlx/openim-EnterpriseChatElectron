@@ -50,7 +50,7 @@ const SearchBar: ForwardRefRenderFunction<SearchBarHandle, SearchBarProps> = ({ 
   return (
     <div className={styles.top_tools}>
       <Input allowClear value={input} onChange={(v) => onChanged(v.target.value)} placeholder={t("Search")} prefix={<SearchOutlined />} />
-      <Dropdown overlay={addMenu} placement="bottomCenter" arrow>
+      <Dropdown overlay={addMenu} placement="bottom" arrow>
         <Button style={{ marginLeft: "14px" }} shape="circle" icon={<PlusOutlined style={{ color: "#bac0c1" }} />} />
       </Dropdown>
     </div>

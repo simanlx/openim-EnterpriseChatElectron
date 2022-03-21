@@ -45,9 +45,9 @@ const TogetherSend = () => {
         isContent
         ? <ul className='message'>
             {
-              new Array(6).fill(null).map(item => {
+              new Array(6).fill(null).map((item, index) => {
                 return (
-                  <li>
+                  <li key={index}>
                     <div className="title">
                       <div className='text_box'>
                         {t('SendTo')}&nbsp;
