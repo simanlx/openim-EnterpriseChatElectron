@@ -22,6 +22,7 @@ import {
   getUnReadCount,
   getSentFriendApplicationList,
   getSentGroupApplicationList,
+  getOriginIDList,
 } from "../../store/actions/contacts";
 import IMConfigModal from "./components/IMConfigModal";
 import TopBar from "../../components/TopBar";
@@ -163,11 +164,6 @@ const Login = () => {
     let platformID = 5;
     if (window.electron) {
       url = await window.electron.getLocalWsAddress();
-      // if(window.process.platform==="darwin"){
-      //   platformID = 4
-      // }else if(window.process.platform==="win32"){
-      //   platformID = 3
-      // }
     }
     const config: InitConfig = {
       userID,

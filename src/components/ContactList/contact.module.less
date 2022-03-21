@@ -3,11 +3,17 @@
   flex-direction: column;
   position: relative;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
+  // overflow-x: hidden;
+  // overflow-y: scroll;
+  :global{
+    .infinite-scroll-component__outerdiv{
+      height: 100%;
+      .infinite-scroll-component {
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+    }
   }
 
   .cons_section {

@@ -3,7 +3,7 @@ import { ContactActionTypes, ContactState, SET_BLACK_LIST, SET_FRIEND_LIST, SET_
 
 let initialState: ContactState = {
     friendList:[],
-    originList:[],
+    originList:{id:[],info:[],current:0,loading:false},
     groupList:[],
     blackList:[],
     recvFriendApplicationList:[],
@@ -31,7 +31,7 @@ let initialState: ContactState = {
       case SET_FRIEND_LIST:
         return { ...state, friendList: action.payload };
       case SET_ORIGIN_LIST:
-        return { ...state, originList: action.payload };
+        return { ...state, originList: {...state.originList,...action.payload} };
       case SET_GROUP_LIST:
         return { ...state, groupList: action.payload };
       case SET_BLACK_LIST:

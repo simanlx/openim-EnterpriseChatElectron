@@ -10,7 +10,7 @@ import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { RootState } from "../store";
 import { events, im } from "../utils";
 import { getIMUrl } from "../config";
-import { message, Modal, Spin } from "antd";
+import { Modal, Spin } from "antd";
 import { getCveList, setCurCve, setCveList } from "../store/actions/cve";
 import {
   getBlackList,
@@ -33,12 +33,17 @@ import {
   setGroupInfo,
   getGroupMemberList,
 } from "../store/actions/contacts";
-import { getSelfInfo, getAdminToken } from "../store/actions/user";
+import { getSelfInfo, getAdminToken, setSelfInfo } from "../store/actions/user";
 import { CbEvents } from "../utils/open_im_sdk";
-import { ConversationItem, FriendApplicationItem, GroupApplicationItem, WsResponse } from "../utils/open_im_sdk/types";
-import { OPENSINGLEMODAL } from "../constants/events";
+import { ConversationItem, FriendApplicationItem, GroupApplicationItem, RtcInvite, WsResponse } from "../utils/open_im_sdk/types";
+import { OPENSINGLEMODAL, SIGNALINGINVITE } from "../constants/events";
 import { cveSort } from "../utils";
+<<<<<<< HEAD
 import TogetherSend from "../pages/home/TogetherSend/TogetherSend";
+=======
+import RtcModal, { RtcModalProps } from "../pages/home/Rtc/RtcModal";
+import { SessionType } from "../constants/messageContentType";
+>>>>>>> ee04266b9f7047054b94fd98ad0e5a9c30bd0ef0
 
 type GruopHandlerType = "added" | "deleted" | "info" | "memberAdded" | "memberDeleted";
 
@@ -60,7 +65,15 @@ const Auth = () => {
   const groupList = useSelector((state: RootState) => state.contacts.groupList, shallowEqual);
   const curCve = useSelector((state: RootState) => state.cve.curCve, shallowEqual);
   const groupMemberList = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
+  const [rtcConfig, setRtcConfig] = useState<Omit<RtcModalProps, "myClose">>({
+    visible: false,
+    isVideo: false,
+    isSingle: false,
+    isCalled: false,
+    invitation: {} as RtcInvite,
+  });
 
+  // global click event
   useEffect(() => {
     window.userClick = async (id: string) => {
       if (id === selfInfo.userID) {
@@ -82,6 +95,7 @@ const Auth = () => {
     };
   }, [selfInfo]);
 
+  // try login with token
   useEffect(() => {
     // if (!curuid && token && userID) {
     if (token && userID) {
@@ -98,6 +112,14 @@ const Auth = () => {
     }
   }, []);
 
+  // self update
+  useEffect(() => {
+    im.on(CbEvents.ONSELFINFOUPDATED,({data}) => {
+      dispatch(setSelfInfo(JSON.parse(data)))
+    })
+  },[])
+
+  // cve update
   const conversationChnageHandler = (data: WsResponse) => {
     let tmpCves = cves;
     let filterArr: ConversationItem[] = [];
@@ -126,6 +148,7 @@ const Auth = () => {
     };
   }, [cves, curCve]);
 
+  // friend update
   const friendHandlerTemplate = (data: WsResponse, type: "info" | "added" | "deleted") => {
     const user = JSON.parse(data.data);
     const tmpArr = [...friendList];
@@ -156,6 +179,7 @@ const Auth = () => {
     };
   }, [friendList]);
 
+  // black update
   const blackAddedHandler = (data: WsResponse) => {
     const black = JSON.parse(data.data);
     const tmpBlackArr = [...blackList];
@@ -190,6 +214,7 @@ const Auth = () => {
     };
   }, [blackList, friendList]);
 
+  // group update
   const isCurGroup = (gid: string) => curCve?.groupID === gid;
 
   const groupHandlerTemplate = (data: WsResponse, type: GruopHandlerType) => {
@@ -280,6 +305,51 @@ const Auth = () => {
     });
   }, []);
 
+
+  // RTC
+  const newInvitationHandler = ({ data }: { data: any }) => {
+    data = JSON.parse(data);
+    if (rtcConfig.visible) return;
+    setRtcConfig({
+      isCalled: true,
+      isSingle: data.invitation.sessionType === SessionType.SINGLECVE,
+      isVideo: data.invitation.mediaType === "video",
+      invitation: data.invitation,
+      visible: true,
+    });
+  };
+
+  const sendInviteHandler = (invitation: any) => {
+    setRtcConfig({
+      isCalled: false,
+      isSingle: invitation.sessionType === SessionType.SINGLECVE,
+      isVideo: invitation.mediaType === "video",
+      invitation,
+      visible: true,
+    });
+  };
+
+  const otherHandler = () => {
+    if(rtcConfig.visible){
+      closeRtcModal();
+    }
+  }
+
+  useEffect(() => {
+    im.on(CbEvents.ONRECEIVENEWINVITATION, newInvitationHandler);
+    im.on(CbEvents.ONINVITEEACCEPTEDBYOTHERDEVICE, otherHandler);
+    im.on(CbEvents.ONINVITEEREJECTEDBYOTHERDEVICE, otherHandler);
+    events.on(SIGNALINGINVITE, sendInviteHandler);
+    return () => {
+      im.off(CbEvents.ONRECEIVENEWINVITATION, newInvitationHandler);
+      im.off(CbEvents.ONINVITEEACCEPTEDBYOTHERDEVICE, otherHandler);
+      im.off(CbEvents.ONINVITEEREJECTEDBYOTHERDEVICE, otherHandler);
+      events.off(SIGNALINGINVITE, sendInviteHandler);
+    };
+  }, [rtcConfig]);
+
+
+  // application update
   const applicationHandlerTemplate = (data: any, failed: string, reqFlag: boolean = false) => {
     let dispatchFn = (list: any) => {};
     let tmpArr: any[] = [];
@@ -366,11 +436,6 @@ const Auth = () => {
     let platformID = 5;
     if (window.electron) {
       url = await window.electron.getLocalWsAddress();
-      // if(window.process.platform==="darwin"){
-      //   platformID = 4
-      // }else if(window.process.platform==="win32"){
-      //   platformID = 3
-      // }
     }
     const config = {
       userID,
@@ -404,7 +469,7 @@ const Auth = () => {
 
   const invalid = () => {
     setGolbalLoading(false);
-    message.warning("登录失效，请重新登录！");
+    // message.warning("登录失效，请重新登录！");
     localStorage.removeItem(`improfile`);
     // localStorage.removeItem('lastimuid')
     navigate("/login");
@@ -420,25 +485,32 @@ const Auth = () => {
     return [...map.values()];
   };
 
+  const closeRtcModal = () => setRtcConfig({ ...rtcConfig, visible: false });
+
+  const GolbalLoading = () => (
+    <Modal
+      footer={null}
+      visible={golbalLoading}
+      closable={false}
+      centered
+      className="global_loading"
+      maskStyle={{
+        backgroundColor: "transparent",
+      }}
+      bodyStyle={{
+        padding: 0,
+        textAlign: "center",
+      }}
+    >
+      <Spin tip="login..." size="large" />
+    </Modal>
+  );
+
   return (
     <>
       {token ? <Mylayout /> : <Navigate to="/login" />}
-      <Modal
-        footer={null}
-        visible={golbalLoading}
-        closable={false}
-        centered
-        className="global_loading"
-        maskStyle={{
-          backgroundColor: "transparent",
-        }}
-        bodyStyle={{
-          padding: 0,
-          textAlign: "center",
-        }}
-      >
-        <Spin tip="login..." size="large" />
-      </Modal>
+      {golbalLoading && <GolbalLoading />}
+      {rtcConfig.visible && <RtcModal myClose={closeRtcModal} {...rtcConfig} />}
     </>
   );
 };

@@ -2,7 +2,7 @@ import { UserOutlined, AudioOutlined, PlayCircleOutlined } from "@ant-design/ico
 import { Layout, message, Select, Tooltip } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { DetailType, OnLineResType } from "../../../@types/open_im";
+import { DetailType, MediaType, OnLineResType } from "../../../@types/open_im";
 import { getOnline } from "../../../api/admin";
 import { MyAvatar } from "../../../components/MyAvatar";
 import { RootState } from "../../../store";
@@ -11,9 +11,10 @@ import { events, im, isSingleCve } from "../../../utils";
 import members from "@/assets/images/members.png";
 import { setMember2Status } from "../../../store/actions/contacts";
 import { useTranslation } from "react-i18next";
-import { ConversationItem, GroupItem } from "../../../utils/open_im_sdk/types";
+import { ConversationItem, GroupItem, RtcInvite } from "../../../utils/open_im_sdk/types";
 import { useUpdateEffect } from "ahooks";
-import { APPLICATIONTYPEUPDATE } from "../../../constants/events";
+import { APPLICATIONTYPEUPDATE, GETRTCINVITEIDS, OPENGROUPMODAL, SIGNALINGINVITE } from "../../../constants/events";
+import { SessionType } from "../../../constants/messageContentType";
 
 const { Header } = Layout;
 
@@ -33,6 +34,7 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
   const groupMemberList = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
   const groupMemberLoading = useSelector((state: RootState) => state.contacts.groupMemberLoading, shallowEqual);
   const adminToken = useSelector((state: RootState) => state.user.adminToken, shallowEqual);
+  const selfInfo = useSelector((state: RootState) => state.user.selfInfo, shallowEqual);
   const dispatch = useDispatch();
   const lastCve = useRef<ConversationItem | undefined>(undefined);
 
@@ -106,12 +108,38 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
     });
   };
 
-  const voiceCall = () => {
-    message.info("敬请期待~");
+  const voiceCall = async () => {
+    events.emit(SIGNALINGINVITE, await getCallConfig("audio"));
   };
 
-  const videoCall = () => {
-    message.info("敬请期待~");
+  const videoCall = async () => {
+    events.emit(SIGNALINGINVITE, await getCallConfig("video"));
+  };
+
+  const getIDList = () => {
+    return new Promise<string[]>((resolve, reject) => {
+      if (curCve?.conversationType === SessionType.SINGLECVE) {
+        resolve([curCve!.userID]);
+      } else {
+        events.emit(OPENGROUPMODAL,"rtc_invite", groupMemberList, curCve?.groupID);
+        events.once(GETRTCINVITEIDS,(list: string[]) => {
+          resolve(list);
+        })
+      }
+    });
+  };
+
+  const getCallConfig = async (mediaType: MediaType) => {
+    return {
+      inviterUserID: selfInfo.userID,
+      inviteeUserIDList: await getIDList(),
+      groupID: curCve?.groupID,
+      roomID: "",
+      timeout: 30,
+      mediaType,
+      sessionType: curCve?.conversationType,
+      platformID: window.electron ? window.electron.platform : 5,
+    };
   };
 
   const SingleCveInfo = () => (
@@ -193,9 +221,11 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
   };
 
   return (
-    <Header className="chat_header" style={{ borderBottom: isShowBt ? "1px solid #dedfe0" : "none" }}>
-      {type === "chat" ? <ChatHeader /> : <ConsHeader />}
-    </Header>
+    <>
+      <Header className="chat_header" style={{ borderBottom: isShowBt ? "1px solid #dedfe0" : "none" }}>
+        {type === "chat" ? <ChatHeader /> : <ConsHeader />}
+      </Header>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import { OnLineResType } from "../@types/open_im";
+import { OnLineResType, RegistersType } from "../@types/open_im";
 import { getAdminUrl } from "../config";
 import { request } from "../utils";
 import { uuid } from "../utils/open_im_sdk";
@@ -17,7 +17,7 @@ export const getAuthToken = (uid?:string,secret?:string) =>
     }
   );
 
-export const getOnline = async (userIDList: string[],token:string, opid?: string):Promise<OnLineResType> =>{
+export const getOnline = (userIDList: string[],token:string, opid?: string):Promise<OnLineResType> =>{
   return request.post(
       "/manager/get_users_online_status",
       JSON.stringify({
@@ -32,4 +32,18 @@ export const getOnline = async (userIDList: string[],token:string, opid?: string
       }
     );
 }
-   
+
+export const getRegisters = (token:string, opid?: string):Promise<RegistersType> =>{
+  return request.post(
+      "/manager/get_all_users_uid",
+      JSON.stringify({
+        operationID: opid ?? uuid("uuid")
+      }),
+      {
+        baseURL: getAdminUrl(),
+        headers:{
+            token
+        }
+      }
+    );
+}

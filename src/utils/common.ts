@@ -7,6 +7,7 @@ import file_xslx from "@/assets/images/file_xslx.png";
 import file_zip from "@/assets/images/file_zip.png";
 import { RcFile } from "antd/lib/upload";
 import axios from "axios";
+import { Participant, Track } from "livekit-client";
 
 export const findEmptyValue = (obj: any) => {
   let flag = true;
@@ -19,10 +20,9 @@ export const findEmptyValue = (obj: any) => {
 };
 
 export const pySegSort = (arr: any[]) => {
-
   if (arr.length == 0) return;
   if (!String.prototype.localeCompare) return null;
-  var letters = "#ABCDEFGHJKLMNOPQRSTWXYZ".split("");
+  var letters = "#ABCDEFGHIJKMNOPQRSTWXYZ".split("");
   var zh = "阿八嚓哒妸发旮哈讥咔垃痳拏噢妑七呥扨它穵夕丫帀".split("");
   var segs: any = []; // 存放数据
   var res: any = {};
@@ -55,7 +55,6 @@ export const pySegSort = (arr: any[]) => {
         }
       }
     });
-
     if (curr.data.length) {
       curr.initial = letters[i];
       segs.push(curr);
@@ -65,7 +64,6 @@ export const pySegSort = (arr: any[]) => {
     }
   });
   res.segs = Array.from(new Set(segs)); //去重
-  // console.log(res.segs);
   const lastData = res.segs.shift();
   res.segs.push(lastData);
   return res;
@@ -201,7 +199,7 @@ export const getVideoInfo = (file: RcFile): Promise<number> => {
   });
 };
 
-export const base64toFile = (base64Str:string) => {
+export const base64toFile = (base64Str: string) => {
   var arr = base64Str.split(","),
     fileType = arr[0].match(/:(.*?);/)![1],
     bstr = atob(arr[1]),
@@ -232,7 +230,7 @@ export const contenteditableDivRange = () => {
   document.execCommand("delete");
 };
 
-export const move2end = (ref:React.RefObject<HTMLDivElement>) => {
+export const move2end = (ref: React.RefObject<HTMLDivElement>) => {
   const sel = window.getSelection();
   const range = document.createRange();
   range.selectNodeContents(ref.current!);
@@ -241,24 +239,130 @@ export const move2end = (ref:React.RefObject<HTMLDivElement>) => {
   sel?.addRange(range);
 };
 
-export const downloadFileUtil = (filePath: string, filename:string) =>{
-  axios.get(filePath, {
+export const downloadFileUtil = (filePath: string, filename: string) => {
+  axios
+    .get(filePath, {
       headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      'responseType': 'blob'
-  }).then(function (response) {
+      responseType: "blob",
+    })
+    .then(function (response) {
       const blob = new Blob([response.data]);
       const fileName = filename;
-      const linkNode = document.createElement('a');
+      const linkNode = document.createElement("a");
       linkNode.download = fileName;
-      linkNode.style.display = 'none';
+      linkNode.style.display = "none";
       linkNode.href = URL.createObjectURL(blob);
       document.body.appendChild(linkNode);
       linkNode.click();
       URL.revokeObjectURL(linkNode.href);
       document.body.removeChild(linkNode);
-  }).catch(function (error) {
+    })
+    .catch(function (error) {
       console.log(error);
-  });
-}
+    });
+};
+
+export const sec2Format = (seconds: number, dateFormat = "H:i:s") => {
+  var obj: any = {};
+  //@ts-ignore
+  obj.H = Number.parseInt(seconds / 3600);
+  //@ts-ignore
+  obj.i = Number.parseInt((seconds - obj.H * 3600) / 60);
+  //@ts-ignore
+  obj.s = Number.parseInt(seconds - obj.H * 3600 - obj.i * 60);
+  if (obj.H < 10) {
+    obj.H = "0" + obj.H;
+  }
+  if (obj.i < 10) {
+    obj.i = "0" + obj.i;
+  }
+  if (obj.s < 10) {
+    obj.s = "0" + obj.s;
+  }
+  return dateFormat.replace("H", obj.H).replace("i", obj.i).replace("s", obj.s);
+};
+
+type WaterMarkConfig = {
+  container?: HTMLElement;
+  width?: string;
+  height?: string;
+  textAlign?: CanvasTextAlign;
+  textBaseline?: CanvasTextBaseline;
+  font?: string;
+  fillStyle?: string;
+  content?: string;
+  rotate?: number;
+  zIndex?: number;
+};
+
+export const watermark = (config: WaterMarkConfig) => {
+  const {
+    container = document.body,
+    width = "300px",
+    height = "200px",
+    textAlign = "center",
+    textBaseline = "middle",
+    font = "16px Microsoft Yahei",
+    fillStyle = "rgba(184, 184, 184, 0.4)",
+    content="",
+    rotate=24,
+    zIndex="1000",
+  } = config;
+  const canvas = document.createElement("canvas");
+
+  canvas.setAttribute("width", width);
+  canvas.setAttribute("height", height);
+  const ctx = canvas.getContext("2d");
+
+  ctx!.textAlign = textAlign;
+  ctx!.textBaseline = textBaseline;
+  ctx!.font = font;
+  ctx!.fillStyle = fillStyle;
+  ctx!.rotate((Math.PI / 180) * rotate);
+  ctx!.fillText(content, parseFloat(width) / 2, parseFloat(height) / 2);
+
+  const base64Url = canvas.toDataURL();
+  const __wm = document.querySelector(".__wm");
+
+  const watermarkDiv = __wm || document.createElement("div");
+  const styleStr = `
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:${zIndex};
+  pointer-events:none;
+  background-repeat:repeat;
+  background-image:url('${base64Url}')`;
+
+  watermarkDiv.setAttribute("style", styleStr);
+  watermarkDiv.classList.add("__wm");
+
+  if (!__wm) {
+    container.style.position = "relative";
+    container.insertBefore(watermarkDiv, container.firstChild);
+  }
+
+  const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+  if (MutationObserver) {
+    let mo = new MutationObserver(function () {
+      const __wm = document.querySelector(".__wm");
+      if ((__wm && __wm.getAttribute("style") !== styleStr) || !__wm) {
+        mo.disconnect();
+        //@ts-ignore
+        mo = null;
+        watermark(JSON.parse(JSON.stringify(config)));
+      }
+    });
+
+    mo.observe(container, {
+      attributes: true,
+      subtree: true,
+      childList: true,
+    });
+  }
+};

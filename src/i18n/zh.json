@@ -291,6 +291,17 @@
     "PleaseEnterTheLabelName":"请输入标签名称",
     "LabelMember":"标签成员",
     "ClickAddMemberToLabel":"点击添加标签成员",
-    "AddLabelMember":"添加标签成员"
-
+    "AddLabelMember":"添加标签成员",
+    "CallVideo":"正在发起视频通话",
+    "CallVoice":"正在发起音频通话",
+    "CalledVideo":"邀请你进行视频通话",
+    "CalledVoice":"邀请你进行音频通话",
+    "GroupCallingVoice":"{{num}}人正在进行语音通话",
+    "GroupCallingVideo":"{{num}}人正在进行视频通话",
+    "Answer":"接听",
+    "HangUp":"挂断",
+    "Microphone":"麦克风",
+    "Camera":"摄像头",
+    "CallVideoTitle":"发起视频通话",
+    "CallVoiceTitle":"发起音频通话"
 }

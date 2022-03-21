@@ -1,13 +1,14 @@
 import { UserAddOutlined, MessageOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { Layout, Modal, Input, Button, message } from "antd";
-import { cloneElement, FC, forwardRef, useEffect, useRef, useState } from "react";
+import { cloneElement, FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ModalType } from "../../../@types/open_im";
 import SearchBar, { SearchBarHandle } from "../../../components/SearchBar";
 import { CLEARSEARCHINPUT, FORWARDANDMERMSG, OPENGROUPMODAL, OPENSINGLEMODAL, TOASSIGNCVE } from "../../../constants/events";
 import { events, im } from "../../../utils";
 import { FriendItem, GroupItem, GroupMemberItem, PublicUserItem } from "../../../utils/open_im_sdk/types";
 import GroupCard from "./GroupCard";
-import GroupOpModal, { ModalType } from "./GroupOpModal";
+import MultipleSelectModal, { MultipleSelectModalProps } from "./MultipleSelectModal";
 import UserCard from "./UserCard";
 
 const { Sider } = Layout;
@@ -113,7 +114,7 @@ const HomeSider: FC<HomeSiderProps> = ({ children, searchCb }) => {
 
   const openGroupModalHandler = (type: ModalType, members: GroupMemberItem[], gid: string) => {
     setGroupInfo({ members, gid });
-    setModal(type);
+    setModal(type)
   };
 
   const clearSearchHandler = () => {
@@ -244,8 +245,11 @@ const HomeSider: FC<HomeSiderProps> = ({ children, searchCb }) => {
       )}
       {userCardVisible && <UserCard close={closeDragCard} type={singleType} info={serchRes} draggableCardVisible={userCardVisible} />}
       {groupCardVisible && <GroupCard close={closeDragCard} info={serchRes as GroupItem} draggableCardVisible={groupCardVisible} />}
-      {groupOpModalVisible && (
+      {/* {groupOpModalVisible && (
         <GroupOpModal options={forwardMsg} groupId={groupInfo?.gid} groupMembers={groupInfo?.members} modalType={modalType} visible={groupOpModalVisible} close={closeOpModal} />
+      )} */}
+      {groupOpModalVisible && (
+        <MultipleSelectModal options={forwardMsg} groupId={groupInfo?.gid} groupMembers={groupInfo?.members} modalType={modalType} visible={groupOpModalVisible} close={closeOpModal} />
       )}
     </Sider>
   );

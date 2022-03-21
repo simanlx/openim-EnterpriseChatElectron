@@ -39,6 +39,9 @@ import {
   isRecvParams,
   SearchLocalParams,
   InsertGroupMsgParams,
+  FaceMessageParams,
+  RtcInvite,
+  RtcActionParams,
 } from "../types";
 
 export default class OpenIMSDK extends Emitter {
@@ -328,6 +331,19 @@ export default class OpenIMSDK extends Emitter {
       const _uuid = operationID || uuid(this.uid as string);
       const args = {
         reqFuncName: RequestFunc.CREATEFORWARDMESSAGE,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  };
+
+  createFaceMessage = (data: FaceMessageParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.CREATEFACEMESSAGE,
         operationID: _uuid,
         userID: this.uid,
         data,
@@ -1085,6 +1101,76 @@ export default class OpenIMSDK extends Emitter {
       this.wsSend(args, resolve, reject);
     });
   };
+
+  signalingInvite = (data: RtcInvite, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const tmp: any = {};
+      tmp.invitation = data;
+      const args = {
+        reqFuncName: RequestFunc.SIGNALINGINVITE,
+        operationID: _uuid,
+        userID: this.uid,
+        data:tmp,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  }
+
+  signalingInviteInGroup = (data: RtcInvite, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const tmp: any = {};
+      tmp.invitation = data;
+      const args = {
+        reqFuncName: RequestFunc.SIGNALINGINVITEINGROUP,
+        operationID: _uuid,
+        userID: this.uid,
+        data:tmp,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  }
+
+  signalingAccept = (data: RtcActionParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.SIGNALINGACCEPT,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  }
+
+  signalingReject = (data: RtcActionParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.SIGNALINGREJECT,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  }
+
+  signalingCancel = (data: RtcActionParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.SIGNALINGCANCEL,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  }
+
 
   //tool methods
 

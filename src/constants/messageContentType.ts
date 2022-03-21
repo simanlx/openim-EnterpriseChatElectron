@@ -13,6 +13,7 @@ export enum messageTypes {
   HASREADRECEIPTMESSAGE = 112,
   TYPINGMESSAGE = 113,
   QUOTEMESSAGE = 114,
+  FACEMESSAGE = 115,
 }
 
 export enum tipsTypes {
@@ -36,6 +37,11 @@ export enum tipsTypes {
   MEMBERKICKED = 1508,
   MEMBERINVITED = 1509,
   MEMBERENTER = 1510,
+}
+
+export enum customType {
+  VideoCall = "c100",
+  VoiceCall = "c101",
 }
 
 export const nomalMessageTypes = [

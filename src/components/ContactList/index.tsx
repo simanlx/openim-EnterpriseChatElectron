@@ -1,12 +1,14 @@
 import { UserOutlined } from "@ant-design/icons";
-import { Empty } from "antd";
+import { Divider, Empty, Skeleton } from "antd";
 import { FC, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SessionType } from "../../constants/messageContentType";
 import { pySegSort } from "../../utils/common";
-import { FriendItem } from "../../utils/open_im_sdk/types";
+import { FriendItem, PublicUserItem } from "../../utils/open_im_sdk/types";
 import { MyAvatar } from "../MyAvatar";
+import InfiniteScroll from "react-infinite-scroll-component";
 import styles from "./contact.module.less";
+import { Loading } from "../Loading";
 
 type ConSectionProps = {
   section: string;
@@ -29,15 +31,17 @@ const ConSection: FC<ConSectionProps> = ({ section, items, clickItem }) => (
   </div>
 );
 
-const SectionItemComp: FC<SectionItemProps> = ({ item,clickItem }) => (
+const SectionItemComp: FC<SectionItemProps> = ({ item, clickItem }) => (
   <div onDoubleClick={() => clickItem(item, SessionType.SINGLECVE)} className={styles.cons_section_item}>
     <MyAvatar shape="square" size={36} src={item.faceURL} icon={<UserOutlined />} />
-    <div className={styles.cons_item_desc}>{item.remark===''?item.nickname:item.remark}</div>
+    <div className={styles.cons_item_desc}>{item.remark === "" || item.remark === undefined ? item.nickname : item.remark}</div>
   </div>
 );
 
 type ContactListProps = {
-  contactList: FriendItem[];
+  contactList: FriendItem[] | PublicUserItem[];
+  hasMore?: boolean;
+  fetchMoreData?: () => void;
   clickItem: (item: FriendItem, type: SessionType) => void;
 };
 
@@ -46,9 +50,9 @@ type Cons = {
   initial: string;
 };
 
-const ContactList: FC<ContactListProps> = ({ contactList, clickItem }) => {
+const ContactList: FC<ContactListProps> = ({ contactList, hasMore, fetchMoreData, clickItem }) => {
   const [sections, setSections] = useState<Array<string>>([]);
-  const [cons, setCons] = useState<Cons[]>();
+  const [cons, setCons] = useState<Cons[]>([]);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -63,6 +67,8 @@ const ContactList: FC<ContactListProps> = ({ contactList, clickItem }) => {
     const el = document.getElementById(id);
     el?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
+
+  const fn = ()=>{}
 
   const ListView = () => (
     <>
@@ -80,8 +86,21 @@ const ContactList: FC<ContactListProps> = ({ contactList, clickItem }) => {
       </div>
     </>
   );
-
-  return <div className={styles.cons_box}>{contactList.length > 0 ? <ListView /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("NoData")} />}</div>;
+  return (
+    <div id="scrollableDiv" className={styles.cons_box}>
+      <InfiniteScroll
+        dataLength={cons.length}
+        next={fetchMoreData??fn}
+        hasMore={hasMore??false}
+        loader={<Loading height="72px" />}
+        endMessage={<Divider plain/>}
+        scrollableTarget="scrollableDiv"
+        height="100%"
+      >
+        {contactList.length > 0 ? <ListView /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("NoData")} />}
+      </InfiniteScroll>
+    </div>
+  );
 };
 
 export default ContactList;

@@ -17,6 +17,7 @@ enum RequestFunc {
     CREATEFORWARDMESSAGE="CreateForwardMessage",
     CREATEQUOTEMESSAGE="CreateQuoteMessage",
     CREATECARDMESSAGE="CreateCardMessage",
+    CREATEFACEMESSAGE="CreateFaceMessage",
     SENDMESSAGE="SendMessage",
     SENDMESSAGENOTOSS="SendMessageNotOss",
     GETHISTORYMESSAGELIST="GetHistoryMessageList",
@@ -71,7 +72,12 @@ enum RequestFunc {
     GETSENDGROUPAPPLICATIONLIST="GetSendGroupApplicationList",
     GETRECVGROUPAPPLICATIONLIST="GetRecvGroupApplicationList",
     ACCEPTGROUPAPPLICATION="AcceptGroupApplication",
-    REFUSEGROUPAPPLICATION="RefuseGroupApplication"
+    REFUSEGROUPAPPLICATION="RefuseGroupApplication",
+    SIGNALINGINVITE="SignalingInvite",
+    SIGNALINGINVITEINGROUP = "SignalingInviteInGroup",
+    SIGNALINGACCEPT = "SignalingAccept",
+    SIGNALINGREJECT = "SignalingReject",
+    SIGNALINGCANCEL = "SignalingCancel"
 }
 
 enum CbEvents {
@@ -109,7 +115,14 @@ enum CbEvents {
     ONGROUPINFOCHANGED = "OnGroupInfoChanged",
     ONGROUPMEMBERINFOCHANGED = "OnGroupMemberInfoChanged",
     ONGROUPAPPLICATIONACCEPTED = "OnGroupApplicationAccepted",
-    ONGROUPAPPLICATIONREJECTED = "OnGroupApplicationRejected"
+    ONGROUPAPPLICATIONREJECTED = "OnGroupApplicationRejected",
+    ONRECEIVENEWINVITATION = "OnReceiveNewInvitation",
+    ONINVITEEACCEPTED = "OnInviteeAccepted",
+    ONINVITEEREJECTED = "OnInviteeRejected",
+    ONINVITATIONCANCELLED = "OnInvitationCancelled",
+    ONINVITATIONTIMEOUT = "OnInvitationTimeout",
+    ONINVITEEACCEPTEDBYOTHERDEVICE = "OnInviteeAcceptedByOtherDevice",
+    ONINVITEEREJECTEDBYOTHERDEVICE = "OnInviteeRejectedByOtherDevice",
 }
 
 export {

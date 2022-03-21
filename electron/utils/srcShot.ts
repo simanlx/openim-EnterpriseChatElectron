@@ -22,7 +22,6 @@ export const screenshot = () => {
   const exPath = isDev ? `${__dirname}/../../../electron/exec/PrintScr.exe` : `${appPath}/../exec/PrintScr.exe`;
 
   if (process.platform == "darwin") {
-    //判断当前操作系统，"darwin" 是mac系统     "win32" 是window系统
     exec(`screencapture -i -c`, (error, stdout, stderr) => {
       if (!error) {
         clipboardParsing();

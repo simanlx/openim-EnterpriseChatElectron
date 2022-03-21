@@ -1,10 +1,16 @@
 import { MemberMapType } from "../../@types/open_im";
-import { BlackItem, FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem, GroupMemberItem } from "../../utils/open_im_sdk/types";
+import { BlackItem, FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem, GroupMemberItem, PublicUserItem } from "../../utils/open_im_sdk/types";
 
+export type OriginListType = {
+  id: string[];
+  info:PublicUserItem[];
+  current:number;
+  loading: boolean;
+}
 
 export type ContactState = {
   friendList: FriendItem[];
-  originList: FriendItem[];
+  originList: OriginListType;
   groupList: GroupItem[];
   blackList: BlackItem[];
   recvFriendApplicationList: FriendApplicationItem[];
@@ -39,7 +45,7 @@ type SetFriendList = {
 
 type SetOriginList = {
   type: typeof SET_ORIGIN_LIST;
-  payload: FriendItem[];
+  payload: Partial<OriginListType>;
 };
 
 type SetRecvFriendApplicationList = {

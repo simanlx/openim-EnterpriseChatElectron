@@ -85,6 +85,11 @@ export type MergerMsgParams = {
   summaryList: string[];
 };
 
+export type FaceMessageParams = {
+  index: number;
+  data: string;
+};
+
 export type LocationMsgParams = {
   description: string;
   longitude: number;
@@ -250,6 +255,22 @@ export type AccessGroupParams = {
   groupID: string;
   fromUserID: string;
   handleMsg: string;
+};
+
+export type RtcInvite = {
+  inviterUserID: string;
+  inviteeUserIDList: string[];
+  groupID: string;
+  roomID: string;
+  timeout: number;
+  mediaType: string;
+  sessionType: number;
+  platformID: number;
+};
+
+export type RtcActionParams = {
+  opUserID: string;
+  invitation: RtcInvite;
 };
 
 export type Ws2Promise = {
