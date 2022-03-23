@@ -44,3 +44,13 @@ export type LanguageType = "zh-cn" | "en";
 export type MediaType = "video" | "audio"
 
 export type ModalType = "create" | "invite" | "remove" | "forward" | "rtc_invite";
+
+export type FaceType = "emoji" | "customEmoji";
+
+export type CustomEmojiType = {
+  url: string;
+  width: string;
+  height: string;
+};
+
+

@@ -303,5 +303,8 @@
     "Microphone":"Mic",
     "Camera":"Camera",
     "CallVideoTitle":"Initiating a video call",
-    "CallVoiceTitle":"Initiating a audio call"
+    "CallVoiceTitle":"Initiating a audio call",
+    "MessageRecipientList":"Message recipient list",
+    "PeopleUnRead":"People UnRead",
+    "PeopleReaded":"PeopleReaded"
 }

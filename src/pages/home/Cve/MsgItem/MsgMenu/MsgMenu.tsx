@@ -19,7 +19,7 @@ import { MessageItem } from "../../../../../utils/open_im_sdk/types";
 
 const canCpTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE];
 const canDownloadTypes = [messageTypes.PICTUREMESSAGE, messageTypes.VIDEOMESSAGE, messageTypes.FILEMESSAGE];
-const canAddTypes = [messageTypes.PICTUREMESSAGE]
+const canAddTypes = [messageTypes.PICTUREMESSAGE, messageTypes.FACEMESSAGE]
 
 type MsgMenuProps = {
   visible: boolean;
@@ -102,11 +102,24 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
     const otherUserEmoji = userEmoji.filter((item: any) => {
       return item.userID !== String(userId)
     })
-    console.log(emojiObj)
-    emojiObj[0].emoji = [
-      msg.pictureElem.sourcePicture.url,
-      ...emojiObj[0].emoji
-    ]
+    // console.log(emojiObj)
+    console.log(msg)
+    if(msg.contentType === messageTypes.PICTUREMESSAGE) {
+      emojiObj[0].emoji = [
+        {
+          url: msg.pictureElem.sourcePicture.url,
+          width: msg.pictureElem.sourcePicture.width,
+          height: msg.pictureElem.sourcePicture.height,
+        },
+        ...emojiObj[0].emoji
+      ]
+    } else {
+      emojiObj[0].emoji = [
+        JSON.parse(msg.faceElem.data),
+        ...emojiObj[0].emoji
+      ]
+    }
+    
     const allUserEmoji = [
       {
         userID: String(userId),

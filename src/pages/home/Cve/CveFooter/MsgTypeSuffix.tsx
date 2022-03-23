@@ -13,10 +13,12 @@ import send_video from "@/assets/images/send_video.png";
 import send_file from "@/assets/images/send_file.png";
 import { useTranslation } from "react-i18next";
 import { getCosAuthorization } from "../../../../utils/cos";
+import { CustomEmojiType, FaceType } from "../../../../@types/open_im";
+import styles from "../../../../components/SearchBar/index.module.less";
 
 type MsgTypeSuffixProps = {
     choseCard:()=>void
-    faceClick:(face:typeof faceMap[0])=>void;
+    faceClick:(face:typeof faceMap[0] | CustomEmojiType, type: FaceType)=>void;
     sendMsg: (nMsg: string, type: messageTypes) => void;
 }
 
@@ -25,7 +27,8 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
 
   const [expressionStyle, setExpressionStyle] = useState(1) // 1--显示表情符号 2--显示表情包
   const [visibleValue, setVisibleValue] = useState(false)
-  const [emojiMap, setEmojiMap] = useState([])
+  const [emojiMap, setEmojiMap] = useState<CustomEmojiType[]>([])
+  const [getEmojiIndex, setGetEmojiIndex] = useState<number>()
 
   const imgMsg = async (file: RcFile, url: string) => {
     const { width, height } = await getPicInfo(file);
@@ -136,12 +139,40 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
     }
   }
 
+  const deleteFace = () => {
+    const emojiStorage = JSON.parse(localStorage.getItem('userEmoji')!) // 获取本地表情包
+    const userId = JSON.parse(localStorage.getItem('lastimuid')!) // 获取当前用户ID
+    // 获取当前用户的表情包
+    const emojis = emojiStorage.filter((item: any) => {
+      return item.userID === String(userId)
+    })
+    const otherUserEmoji = emojiStorage.filter((item: any) => {
+      return item.userID !== String(userId)
+    })
+    const newFace = emojis[0].emoji.filter((item: any, index: number) => {
+      return index !== getEmojiIndex
+    })
+    const allUserEmoji = [
+      {
+        userID: String(userId),
+        emoji: newFace
+      },
+      ...otherUserEmoji
+    ]
+    localStorage.setItem('userEmoji', JSON.stringify(allUserEmoji))
+    setEmojiMap(newFace)
+  }
+
   const uploadIcon = async (uploadData: UploadRequestOption) => {
     await getCosAuthorization();
     cosUpload(uploadData)
-      .then((res) => {
+      .then( async(res) => {
         // rs.groupIcon = res.url;
         // console.log(res.url)
+        // console.log(uploadData,res)
+        const {width, height} = await getPicInfo(uploadData.file as RcFile)
+        // console.log(width,height)
+
         const userEmoji = JSON.parse(localStorage.getItem('userEmoji')!)
         const userId = JSON.parse(localStorage.getItem('lastimuid')!)
         const emojiObj = userEmoji.filter((item: any) => {
@@ -150,9 +181,13 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
         const otherUserEmoji = userEmoji.filter((item: any) => {
           return item.userID !== String(userId)
         })
-        console.log(emojiObj)
+        // console.log(emojiObj)
         emojiObj[0].emoji = [
-          res.url,
+          {
+            url: res.url,
+            width,
+            height
+          },
           ...emojiObj[0].emoji
         ]
         const allUserEmoji = [
@@ -195,6 +230,12 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
     },
   ];
 
+  const faceMenu = () => (
+    <Menu className={styles.btn_menu}>
+      <Menu.Item key="1" onClick={() => deleteFace()}>{t('Delete')}</Menu.Item>
+    </Menu>
+  )
+
   useImperativeHandle(ref,()=>({
     sendImageMsg:imgMsg
   }))
@@ -205,7 +246,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
         expressionStyle === 1
         ? <div className="face_container_emoji">
             {faceMap.map((face) => (
-              <div key={face.context} onClick={() => faceClick(face)} className="face_item">
+              <div key={face.context} onClick={() => faceClick(face,'emoji')} className="face_item">
                 <AntdImage preview={false} width={24} src={face.src} />
               </div>
             ))}
@@ -218,9 +259,23 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
               </div>
             </span>
           </Upload>
-          {emojiMap?.map((face: any, index) => (
-              <div key={index} onClick={() => faceClick(face)} className="emoji_item">
-                <AntdImage preview={false} style={{borderRadius: '5px'}} height={50} width={50} src={face} />
+          {emojiMap?.map((face, index) => (
+              <div key={index} className="emoji_item">
+                  <Dropdown
+                  overlay={faceMenu}
+                  trigger={['contextMenu']}
+                  placement='bottom'
+                  >
+                    <AntdImage
+                    preview={false}
+                    style={{borderRadius: '5px'}}
+                    height={50}
+                    width={50}
+                    src={face.url}
+                    onClick={() => faceClick(face,'customEmoji')}
+                    onContextMenu={() => setGetEmojiIndex(index)}
+                    />
+                  </Dropdown>
               </div>
             ))}
           </div>
@@ -289,7 +344,9 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
       overlayClassName="face_type_drop"
       overlay={FaceType}
       placement="topRight"
-      arrow>
+      arrow
+      trigger={['click']}
+      >
         {/* <Tooltip title="表情"> */}
         <SmileOutlined style={{ marginRight: "8px" }} />
         {/* </Tooltip> */}

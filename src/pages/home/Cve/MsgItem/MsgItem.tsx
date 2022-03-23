@@ -1,5 +1,5 @@
 import { LoadingOutlined, ExclamationCircleFilled } from "@ant-design/icons";
-import { Spin, Checkbox } from "antd";
+import { Spin, Checkbox, Modal, Dropdown, Menu, Popover } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { messageTypes } from "../../../../constants/messageContentType";
@@ -26,13 +26,13 @@ const canSelectTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE, me
 
 const MsgItem: FC<MsgItemProps> = (props) => {
   const { msg, selfID, curCve, mutilSelect, audio } = props;
-
   const [lastChange, setLastChange] = useState(false);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const avaRef = useRef<HTMLDivElement>(null);
   const msgItemRef = useRef<HTMLDivElement>(null);
   const [inViewport] = useInViewport(msgItemRef);
   const { t } = useTranslation();
+  const [unreadCardShow, setUnreadCardShow] = useState<boolean>(false)
 
   useEffect(() => {
     if (lastChange) {
@@ -43,6 +43,9 @@ const MsgItem: FC<MsgItemProps> = (props) => {
   useEffect(() => {
     if (inViewport && curCve.userID === msg.sendID && !msg.isRead) {
       markC2CHasRead(msg.sendID, msg.clientMsgID);
+    }
+    if (inViewport && curCve.groupID === msg.groupID && curCve.groupID !== '' && !msg.isRead ) {
+      markGroupC2CHasRead()
     }
   }, [inViewport, curCve]);
 
@@ -55,6 +58,10 @@ const MsgItem: FC<MsgItemProps> = (props) => {
     im.markC2CMessageAsRead({ userID, msgIDList: [msgID] });
   };
 
+  const markGroupC2CHasRead = () => {
+    // im.markC2CMessageAsRead({})
+  }
+
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   const switchTip = () => {
@@ -65,9 +72,12 @@ const MsgItem: FC<MsgItemProps> = (props) => {
         if (curCve && isSingleCve(curCve)) {
           return msg.isRead ? t("Readed") : t("UnRead");
         }
+        if (curCve && !isSingleCve(curCve)) {
+          return msg.isRead ? t("Readed") : t("UnRead");
+        }
         return null;
       case 3:
-        return <ExclamationCircleFilled style={{ color: "#f34037", fontSize: "20px" }} />;
+        return <ExclamationCircleFilled style={{ color: "#f34037", fontSize: "20px" }}  onClick={() => console.log(888)} />;
       default:
         break;
     }
@@ -103,6 +113,57 @@ const MsgItem: FC<MsgItemProps> = (props) => {
     delay: 500,
   });
 
+  const handleUnreadVisibleChange = (val: boolean) => {
+    setUnreadCardShow(val)
+  }
+
+  const offCard = () => {
+    setUnreadCardShow(false)
+  }
+
+  const UnReadContent = (
+    <div className="unReadContent">
+      <div className="title">
+          <span>{t('MessageRecipientList')}</span>
+          <span onClick={offCard}></span>
+      </div>
+      <div className="content">
+        <div className="left">
+          <span className="tip">2</span>{t('PeopleReaded')}
+          <div className="list">
+            {
+              new Array(16).fill(null).map(item => (
+                <div className="list_item">
+                  <MyAvatar src={''} size={38} />
+                  <div className="info">
+                    <span>名字</span>
+                    <span>[手机在线]</span>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div className="right">
+          <span className="tip">1</span>{t('PeopleUnRead')}
+          <div className="list">
+            {
+              new Array(6).fill(null).map(item => (
+                <div className="list_item">
+                  <MyAvatar src={''} size={38} />
+                  <div className="info">
+                    <span>名字</span>
+                    <span>[手机在线]</span>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div ref={msgItemRef} onClick={mutilCheckItem} className={`chat_bg_msg ${isSelf(msg.sendID) ? "chat_bg_omsg" : ""}`}>
       {mutilSelect && (
@@ -124,11 +185,38 @@ const MsgItem: FC<MsgItemProps> = (props) => {
         </MsgMenu>
       </div>
 
-      {isSelf(msg.sendID) ? (
-        <div style={{ color: msg.isRead ? "#999" : "#428BE5", marginTop: curCve && isSingleCve(curCve) ? "0" : "24px" }} className="chat_bg_flag">
-          {switchTip()}
-        </div>
-      ) : null}
+      {isSelf(msg.sendID)
+      ? msg.status === 2 
+        ? (
+          <div style={{ color: msg.isRead ? "#999" : "#428BE5", fontSize: '12px'}} className="chat_bg_flag_read">
+            {
+              curCve && isSingleCve(curCve)
+              ? <div>{switchTip()}</div>
+              : <div className="group_UnRead">
+                  {/* <Dropdown overlay={UnReadContent} placement="topRight" trigger={['click']}>
+                    <div onClick={() => {}}>
+                      {`85${t('PeopleUnRead')}`}
+                    </div>
+                  </Dropdown> */}
+                  <Popover
+                  content={UnReadContent}
+                  trigger="click"
+                  overlayClassName="unread_card"
+                  placement="topRight"
+                  onVisibleChange={handleUnreadVisibleChange}
+                  visible={unreadCardShow}
+                  >
+                    {`85${t('PeopleUnRead')}`}
+                  </Popover>
+                </div>
+            }
+          </div>
+        )
+        : <div style={{ color: msg.isRead ? "#999" : "#428BE5", marginTop: curCve && isSingleCve(curCve) ? "0" : "24px" ,fontSize: '12px'}} className="chat_bg_flag">
+            {switchTip()}
+          </div>
+      : null}
+
     </div>
   );
 };

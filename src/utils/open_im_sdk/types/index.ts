@@ -455,6 +455,7 @@ export type MessageItem = {
   soundElem: SoundElem;
   videoElem: VideoElem;
   fileElem: FileElem;
+  faceElem: FaceElem
   mergeElem: MergeElem;
   atElem: AtElem;
   locationElem: LocationElem;
@@ -487,6 +488,11 @@ export type FileElem = {
   fileName: string;
   fileSize: number;
 };
+
+export type FaceElem = {
+  index: number;
+  data: string;
+}
 
 export type LocationElem = {
   description: string;

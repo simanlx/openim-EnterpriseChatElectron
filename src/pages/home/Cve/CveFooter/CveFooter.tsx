@@ -14,6 +14,7 @@ import ContentEditable, { ContentEditableEvent } from "../../../../components/Ed
 import { useLatest } from "ahooks";
 import { ConversationItem, FriendItem, MessageItem } from "../../../../utils/open_im_sdk/types";
 import { getCosAuthorization } from "../../../../utils/cos";
+import { CustomEmojiType, FaceType } from "../../../../@types/open_im";
 
 const { Footer } = Layout;
 
@@ -281,10 +282,16 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     setDraft(curCve);
   };
 
-  const faceClick = (face: typeof faceMap[0]) => {
-    const faceEl = `<img class="face_el" alt="${face.context}" style="padding-right:2px" width="24px" src="${face.src}">`;
-    move2end(inputRef.current!.el);
-    setMsgContent(latestContent.current + faceEl);
+  const faceClick = async(face: typeof faceMap[0] | CustomEmojiType, type: FaceType) => {
+    if (type === 'emoji') {
+      const faceEl = `<img class="face_el" alt="${(face as typeof faceMap[0]).context}" style="padding-right:2px" width="24px" src="${(face as typeof faceMap[0]).src}">`;
+      move2end(inputRef.current!.el);
+      setMsgContent(latestContent.current + faceEl);
+    } else {
+      // console.log(face)
+      const {data} = await im.createFaceMessage({index: -1,data: JSON.stringify(face)})
+      sendMsg(data,messageTypes.FACEMESSAGE)
+    }
   };
 
   const parseAt = (text: string) => {
