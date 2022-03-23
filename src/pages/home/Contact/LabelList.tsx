@@ -49,7 +49,7 @@ const LabelList = () => {
       {
         isData
         ? <div className="group_bg">
-            {new Array(6).fill(null).map(item => <GroupListItem /> )}
+            {new Array(6).fill(null).map((item,idx) => <GroupListItem key={idx} /> )}
           </div>
         : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("NoData")} />
       }

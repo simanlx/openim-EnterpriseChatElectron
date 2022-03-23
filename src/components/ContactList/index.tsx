@@ -41,6 +41,7 @@ const SectionItemComp: FC<SectionItemProps> = ({ item, clickItem }) => (
 type ContactListProps = {
   contactList: FriendItem[] | PublicUserItem[];
   hasMore?: boolean;
+  length?: number;
   fetchMoreData?: () => void;
   clickItem: (item: FriendItem, type: SessionType) => void;
 };
@@ -50,14 +51,14 @@ type Cons = {
   initial: string;
 };
 
-const ContactList: FC<ContactListProps> = ({ contactList, hasMore, fetchMoreData, clickItem }) => {
+const ContactList: FC<ContactListProps> = ({ contactList, hasMore,length, fetchMoreData, clickItem }) => {
   const [sections, setSections] = useState<Array<string>>([]);
   const [cons, setCons] = useState<Cons[]>([]);
   const { t } = useTranslation();
 
   useEffect(() => {
     if (contactList.length > 0) {
-      const sortData: Cons[] = pySegSort(contactList).segs;
+      const sortData: Cons[] = pySegSort(contactList);
       setSections(sortData.map((sec) => sec.initial));
       setCons(sortData);
     }
@@ -89,7 +90,7 @@ const ContactList: FC<ContactListProps> = ({ contactList, hasMore, fetchMoreData
   return (
     <div id="scrollableDiv" className={styles.cons_box}>
       <InfiniteScroll
-        dataLength={cons.length}
+        dataLength={length??cons.length}
         next={fetchMoreData??fn}
         hasMore={hasMore??false}
         loader={<Loading height="72px" />}

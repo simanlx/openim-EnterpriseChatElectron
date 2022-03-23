@@ -208,6 +208,12 @@ export type InviteGroupParams = {
   userIDList: string[];
 };
 
+
+export type GroupMsgReadParams = {
+  groupID: string;
+  msgIDList: string[];
+}
+
 export type GetGroupMemberParams = {
   groupID: string;
   filter: number;

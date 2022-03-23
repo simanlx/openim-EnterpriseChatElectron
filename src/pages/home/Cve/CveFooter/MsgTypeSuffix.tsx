@@ -1,4 +1,4 @@
-import { CrownOutlined, PlusCircleOutlined, PlusOutlined, SmileOutlined } from "@ant-design/icons";
+import { CrownOutlined, PlusCircleOutlined, PlusOutlined, ScissorOutlined, SmileOutlined } from "@ant-design/icons";
 import { Dropdown, Menu, message,Image as AntdImage } from "antd";
 import { FC, forwardRef, useImperativeHandle, useState } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
@@ -336,8 +336,11 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
     </Menu>
   );
 
+  const shotScreen = () => window.electron?.screenshot()
+
   return (
     <div className="suffix_container">
+      {window.electron&&<ScissorOutlined onClick={shotScreen} />}
       <Dropdown
       visible={visibleValue}
       onVisibleChange={handleVisibleChange}
@@ -348,7 +351,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
       trigger={['click']}
       >
         {/* <Tooltip title="表情"> */}
-        <SmileOutlined style={{ marginRight: "8px" }} />
+        <SmileOutlined style={{ margin: "0 8px" }} />
         {/* </Tooltip> */}
       </Dropdown>
 
