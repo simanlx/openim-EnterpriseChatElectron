@@ -148,10 +148,11 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
             tmpList = sentGroupApplicationList;
           }
         }
+        tmpList?.sort((a,b)=>a.handleResult===0? -1 : 1)
         return <NewNotice type={menu.idx} renderType={renderType} renderList={searchFlag ? contacts : tmpList} />;
       case 0:
         const hasMore = originList.current < originList.id.length
-        return <ContactList hasMore={hasMore} fetchMoreData={fetchMoreRegisters} clickItem={clickListItem} contactList={searchFlag ? (contacts as PublicUserItem[]) : originList.info} />;
+        return <ContactList hasMore={hasMore} length={originList.current} fetchMoreData={fetchMoreRegisters} clickItem={clickListItem} contactList={searchFlag ? (contacts as PublicUserItem[]) : originList.info} />;
       case 3:
         return <ContactList clickItem={clickListItem} contactList={searchFlag ? (contacts as FriendItem[]) : friendList} />;
       case 4:

@@ -157,6 +157,7 @@ const RtcModal: FC<RtcModalProps> = ({ visible, isVideo, isSingle, isCalled, inv
       im.off(CbEvents.ONINVITEEREJECTED, rejectHandler);
       im.off(CbEvents.ONINVITATIONCANCELLED, cancelHandler);
       im.off(CbEvents.ONINVITATIONTIMEOUT, timeoutHandler);
+      room?.removeAllListeners();
       room?.disconnect();
     };
   }, []);

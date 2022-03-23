@@ -122,8 +122,10 @@ export const getOriginIDList = (token:string) => {
 };
 
 export const getOriginInfoList = (userIDList:string[],current:number,oldList:PublicUserItem[]=[]) => {
+  console.log(9999);
+  
   return (dispatch: Dispatch) => {
-    dispatch(setOriginList({loading:false}))
+    dispatch(setOriginList({loading:true}))
     im.getUsersInfo(userIDList).then((res) => {
       let info:PublicUserItem[] = []
       JSON.parse(res.data).forEach((item:TotalUserStruct)=>info.push(item.publicInfo!))

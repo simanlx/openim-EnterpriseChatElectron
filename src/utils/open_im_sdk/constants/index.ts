@@ -58,6 +58,7 @@ enum RequestFunc {
     SETCONVERSATIONRECVMESSAGEOPT="SetConversationRecvMessageOpt",
     SEARCHLOCALMESSAGES="SearchLocalMessages",
     MARKGROUPMESSAGEHASREAD="MarkGroupMessageHasRead",
+    MARKGROUPMESSAGEASREAD="MarkGroupMessageAsRead",
     INVITEUSERTOGROUP="InviteUserToGroup",
     KICKGROUPMEMBER="KickGroupMember",
     GETGROUPMEMBERSINFO="GetGroupMembersInfo",

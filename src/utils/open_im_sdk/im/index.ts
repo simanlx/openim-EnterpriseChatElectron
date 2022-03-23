@@ -42,6 +42,7 @@ import {
   FaceMessageParams,
   RtcInvite,
   RtcActionParams,
+  GroupMsgReadParams,
 } from "../types";
 
 export default class OpenIMSDK extends Emitter {
@@ -482,6 +483,21 @@ export default class OpenIMSDK extends Emitter {
         operationID: _uuid,
         userID: this.uid,
         data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  };
+
+  markGroupMessageAsRead = (data: GroupMsgReadParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const tmp:any = data
+      tmp.msgIDList = JSON.stringify(tmp.msgIDList)
+      const args = {
+        reqFuncName: RequestFunc.MARKGROUPMESSAGEASREAD,
+        operationID: _uuid,
+        userID: this.uid,
+        data:tmp,
       };
       this.wsSend(args, resolve, reject);
     });

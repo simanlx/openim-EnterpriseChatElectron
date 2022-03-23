@@ -5,10 +5,11 @@ import { useTranslation } from "react-i18next";
 import { debounce } from "throttle-debounce";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { SessionType } from "../../../../constants/messageContentType";
+import { im } from "../../../../utils";
 import { ConversationItem } from "../../../../utils/open_im_sdk/types";
 
 export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) => {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState("101");
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -20,55 +21,60 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
 
   const tabChange = (key: string) => {
     setActiveKey(key);
+    if(key === "101") return;
+    searchMessage("",Number(key))
   };
+
+  const searchMessage = (key: string,type?:number) => {
+    if(key===""&&!type) return;
+    const options = {
+      sourceID: curCve.conversationType === SessionType.SINGLECVE ? curCve.userID : curCve.groupID,
+      sessionType: curCve.conversationType,
+      keywordList: type ? [] : [key],
+      keywordListMatchType: 0,
+      senderUserIDList: [],
+      messageTypeList: type? [type] : [],
+      searchTimePosition: 0,
+      searchTimePeriod: 0,
+      pageIndex: 1,
+      count:200
+    };
+    im.searchLocalMessages(options).then((res) => {
+      console.log(JSON.parse(res.data));
+    });
+  };
+
+  const debounceSearch = debounce(1000, searchMessage);
 
   return (
     <div className="search_message">
-      <Tabs activeKey={activeKey} defaultActiveKey="1" onChange={tabChange}>
-        <MyTabpane curCve={curCve} tab="消息" key="1">
+      <Tabs activeKey={activeKey} defaultActiveKey="101" onChange={tabChange}>
+        <MyTabpane debounceSearch={debounceSearch} tab="消息" key="101">
           <TextMessageList />
         </MyTabpane>
-        <MyTabpane curCve={curCve} tab="图片" key="2"></MyTabpane>
-        <MyTabpane curCve={curCve} tab="视频" key="3"></MyTabpane>
-        <MyTabpane curCve={curCve} tab="文件" key="4"></MyTabpane>
+        <MyTabpane debounceSearch={debounceSearch} tab="图片" key="102"></MyTabpane>
+        <MyTabpane debounceSearch={debounceSearch} tab="视频" key="104"></MyTabpane>
+        <MyTabpane debounceSearch={debounceSearch} tab="文件" key="105"></MyTabpane>
       </Tabs>
     </div>
   );
 };
 
 interface MyTabpaneProps extends TabPaneProps {
-  curCve: ConversationItem;
+  debounceSearch: (key: string,type?:number) => void;
 }
 
 const MyTabpane: FC<MyTabpaneProps> = (props) => {
   const { t } = useTranslation();
 
-  const inputOnChange = (key: React.ChangeEvent<HTMLInputElement>) => debounceSearch(key.target.value);
+  const inputOnChange = (key: React.ChangeEvent<HTMLInputElement>) => props.debounceSearch(key.target.value);
 
-  const searchMessage = (key: string) => {
-    const options = {
-      sourceID: props.curCve.conversationType === SessionType.SINGLECVE ? props.curCve.userID : props.curCve.groupID,
-      sessionType: props.curCve.conversationType,
-      keywordList: [key],
-      keywordListMatchType: 0,
-      senderUserIDList: [],
-      messageTypeList: [],
-      searchTimePosition: 0,
-      searchTimePeriod: 0,
-      pageIndex: 0,
-      count:0
-    };
-    // im.searchLocalMessages(options).then((res) => {
-    //   console.log(res);
-    // });
-  };
-
-  const debounceSearch = debounce(500, searchMessage);
+  
 
   return (
     <Tabs.TabPane {...props}>
       <div className="message_search_input">
-        <Input disabled onChange={inputOnChange} placeholder={"开发中~"} prefix={<SearchOutlined />} />
+        <Input onChange={inputOnChange} placeholder={"开发中~"} prefix={<SearchOutlined />} />
       </div>
       {props.children}
     </Tabs.TabPane>

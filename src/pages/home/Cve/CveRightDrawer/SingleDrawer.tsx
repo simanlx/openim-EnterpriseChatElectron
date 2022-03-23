@@ -30,11 +30,6 @@ const SingleDrawer: FC<SingleDrawerProps> = ({ curCve, updateOpt, updatePin }) =
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  //
-  const look = useSelector((state: RootState) => state.contacts, shallowEqual)
-  console.log(look)
-  console.log(curCve)
-
   useEffect(() => {
     let flag = 0;
     if (friendList.find((item) => item.userID === curCve?.userID)) {
