@@ -141,6 +141,7 @@ const RtcModal: FC<RtcModalProps> = ({ visible, isVideo, isSingle, isCalled, inv
   useEffect(() => {
     rtcInvite();
     getParticipantsInfo();
+    setRenderActions(isCalled ? calledMaps : callMaps)
   }, []);
 
   useEffect(() => {
@@ -245,16 +246,21 @@ const RtcModal: FC<RtcModalProps> = ({ visible, isVideo, isSingle, isCalled, inv
   };
 
   const connectRtc = async (url: string, token: string) => {
-    await connect(url, token, {
+    const result = await connect(url, token, {
       video: isVideo,
       audio: true,
       videoCaptureDefaults: {
         resolution: VideoPresets.h720.resolution,
       },
     });
-    setIsCalling(true);
-    setRenderActions(isVideo ? callingMaps : callingMaps.slice(0, 2));
-    setTimer();
+    if(result){
+      setIsCalling(true);
+      setRenderActions(isVideo ? callingMaps : callingMaps.slice(0, 2));
+      setTimer();
+    }else{
+      message.error("连接失败！请稍后重试！")
+      myClose();
+    }
   };
 
   const cancelRtc = async () => {
@@ -378,16 +384,16 @@ const RtcModal: FC<RtcModalProps> = ({ visible, isVideo, isSingle, isCalled, inv
         hangupRtc();
         break;
       case RtcActionTypes.MicOff:
-        localParticipant?.setMicrophoneEnabled(false);
+        await localParticipant?.setMicrophoneEnabled(false);
         break;
       case RtcActionTypes.MicOn:
-        localParticipant?.setMicrophoneEnabled(true);
+        await localParticipant?.setMicrophoneEnabled(true);
         break;
       case RtcActionTypes.CameraOff:
-        localParticipant?.setCameraEnabled(false);
+        await localParticipant?.setCameraEnabled(false);
         break;
       case RtcActionTypes.CameraOn:
-        localParticipant?.setCameraEnabled(true);
+        await localParticipant?.setCameraEnabled(true);
         break;
       default:
     }
