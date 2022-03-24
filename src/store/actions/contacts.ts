@@ -112,9 +112,9 @@ export const setUnReadCount = (value: number): ContactActionTypes => {
   };
 };
 
-export const getOriginIDList = (token:string) => {
+export const getOriginIDList = () => {
   return (dispatch: Dispatch) => {
-    getRegisters(token).then(res=>{
+    getRegisters().then(res=>{
       dispatch(setOriginList({id: res.data}))
       dispatch(getOriginInfoList(res.data.slice(0,20),20) as any)
     })

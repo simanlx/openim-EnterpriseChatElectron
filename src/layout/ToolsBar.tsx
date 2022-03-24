@@ -81,7 +81,7 @@ const ToolIcon = ({ tool }: { tool: ToolItem }) => {
           <Badge
             size="small"
             offset={[0, -8]}
-            count={tool.idx === 0 ? unReadCount : applications}
+            count={tool.idx === 0 ? unReadCount: tool.idx === 1 ? applications : null}
           >
             <img
               width="18"

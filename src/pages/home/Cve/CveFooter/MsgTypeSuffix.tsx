@@ -2,7 +2,7 @@ import { CrownOutlined, PlusCircleOutlined, PlusOutlined, ScissorOutlined, Smile
 import { Dropdown, Menu, message,Image as AntdImage } from "antd";
 import { FC, forwardRef, useImperativeHandle, useState } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-import { cosUpload, getPicInfo, getVideoInfo, im } from "../../../../utils";
+import { getPicInfo, getVideoInfo, im, switchUpload } from "../../../../utils";
 import Upload, { RcFile } from "antd/lib/upload";
 import { PICMESSAGETHUMOPTION } from "../../../../config";
 import { faceMap } from "../../../../constants/faceType";
@@ -12,9 +12,9 @@ import send_pic from "@/assets/images/send_pic.png";
 import send_video from "@/assets/images/send_video.png";
 import send_file from "@/assets/images/send_file.png";
 import { useTranslation } from "react-i18next";
-import { getCosAuthorization } from "../../../../utils/cos";
 import { CustomEmojiType, FaceType } from "../../../../@types/open_im";
 import styles from "../../../../components/SearchBar/index.module.less";
+import { minioUploadType } from "../../../../api/admin";
 
 type MsgTypeSuffixProps = {
     choseCard:()=>void
@@ -92,18 +92,17 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
 
 
   const sendCosMsg = async (uploadData: UploadRequestOption, type: string) => {
-    await getCosAuthorization();
-    cosUpload(uploadData)
+    switchUpload(uploadData,type==="pic"?minioUploadType.picture:minioUploadType.file)
       .then((res) => {
         switch (type) {
           case "pic":
-            imgMsg(uploadData.file as RcFile, res.url);
+            imgMsg(uploadData.file as RcFile, res.data.URL);
             break;
           case "video":
-            videoMsg(uploadData.file as RcFile, res.url);
+            videoMsg(uploadData.file as RcFile, res.data.URL);
             break;
           case "file":
-            fileMsg(uploadData.file as RcFile, res.url);
+            fileMsg(uploadData.file as RcFile, res.data.URL);
             break;
           default:
             break;
@@ -164,15 +163,9 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
   }
 
   const uploadIcon = async (uploadData: UploadRequestOption) => {
-    await getCosAuthorization();
-    cosUpload(uploadData)
+    switchUpload(uploadData)
       .then( async(res) => {
-        // rs.groupIcon = res.url;
-        // console.log(res.url)
-        // console.log(uploadData,res)
         const {width, height} = await getPicInfo(uploadData.file as RcFile)
-        // console.log(width,height)
-
         const userEmoji = JSON.parse(localStorage.getItem('userEmoji')!)
         const userId = JSON.parse(localStorage.getItem('lastimuid')!)
         const emojiObj = userEmoji.filter((item: any) => {
@@ -184,7 +177,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
         // console.log(emojiObj)
         emojiObj[0].emoji = [
           {
-            url: res.url,
+            url: res.data.URL,
             width,
             height
           },

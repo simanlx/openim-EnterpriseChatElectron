@@ -37,7 +37,7 @@ export const cos = new COS({
   },
 });
 
-export const cosUploadNomal = (file: File, pcb?: COS.onProgress): Promise<COS.PutObjectResult & { url: string }> => {
+export const cosUploadNomal = (file: File, pcb?: COS.onProgress): Promise<{data:COS.PutObjectResult & { URL: string }}> => {
   const dpcb = () => {};
   return new Promise((resolve, reject) => {
     let cosprofile = localStorage.getItem("cosprofile");
@@ -57,15 +57,18 @@ export const cosUploadNomal = (file: File, pcb?: COS.onProgress): Promise<COS.Pu
         if (cerr) {
           reject(cerr);
         } else {
-          cdata.url = "https://" + cdata.Location;
-          resolve(cdata);
+          cdata.URL = "https://" + cdata.Location;
+          const tdata = {
+            data: cdata,
+          };
+          resolve(tdata);
         }
       }
     );
   });
 };
 
-export const cosUpload = (data: UploadRequestOption, pcb?: COS.onProgress): Promise<COS.PutObjectResult & { url: string }> => {
+export const cosUpload = (data: UploadRequestOption, pcb?: COS.onProgress): Promise<{data:COS.PutObjectResult & { URL: string }}> => {
   const dpcb = () => {};
   return new Promise((resolve, reject) => {
     let cosprofile = localStorage.getItem("cosprofile");
@@ -86,15 +89,18 @@ export const cosUpload = (data: UploadRequestOption, pcb?: COS.onProgress): Prom
         if (cerr) {
           reject(cerr);
         } else {
-          cdata.url = "https://" + cdata.Location;
-          resolve(cdata);
+          cdata.URL = "https://" + cdata.Location;
+          const tdata = {
+            data: cdata,
+          };
+          resolve(tdata);
         }
       }
     );
   });
 };
 
-export const thumUpload = (file: File): Promise<COS.PutObjectResult & { url: string }> => {
+export const thumUpload = (file: File): Promise<{data:COS.PutObjectResult & { URL: string }}> => {
   return new Promise((resolve, reject) => {
     let cosprofile = localStorage.getItem("cosprofile");
     if (!cosprofile) reject("no cosprofile");
@@ -113,8 +119,11 @@ export const thumUpload = (file: File): Promise<COS.PutObjectResult & { url: str
         if (cerr) {
           reject(cerr);
         } else {
-          cdata.url = "https://" + cdata.Location;
-          resolve(cdata);
+          cdata.URL = "https://" + cdata.Location;
+          const tdata = {
+            data: cdata,
+          };
+          resolve(tdata);
         }
       }
     );

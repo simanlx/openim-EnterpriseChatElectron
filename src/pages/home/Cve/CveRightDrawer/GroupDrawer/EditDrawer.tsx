@@ -6,8 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector, shallowEqual } from "react-redux";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { RootState } from "../../../../../store";
-import { cosUpload, im } from "../../../../../utils";
-import { getCosAuthorization } from "../../../../../utils/cos";
+import { im, switchUpload } from "../../../../../utils";
 import { GroupItem } from "../../../../../utils/open_im_sdk/types";
 
 type EditDrawerProps = {
@@ -27,10 +26,9 @@ const EditDrawer: FC<EditDrawerProps> = ({  }) => {
 
   
   const uploadIcon = async (uploadData: UploadRequestOption) => {
-    await getCosAuthorization();
-    cosUpload(uploadData)
+    switchUpload(uploadData)
       .then((res) => {
-        changeGroupInfo(res.url, "faceURL");
+        changeGroupInfo(res.data.URL, "faceURL");
       })
       .catch((err) => message.error(t("UploadFailed")));
   };
