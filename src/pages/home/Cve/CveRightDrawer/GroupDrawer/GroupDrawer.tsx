@@ -15,8 +15,8 @@ type GroupDrawerProps = {
   role: GroupRole;
   groupMembers: GroupMemberItem[];
   changeType: (tp: DrawerType) => void;
-  updatePin: (e:boolean) => void;
-  updateOpt: (e:boolean)=> void;
+  updatePin: (e: boolean) => void;
+  updateOpt: (e: boolean) => void;
 };
 
 const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeType, updatePin, updateOpt }) => {
@@ -37,8 +37,10 @@ const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeT
   };
 
   const dissolveGroup = () => {
-    message.info("敬请期待~")
-  }
+    im.dismissGroup(curCve.groupID)
+      .then((res) => message.success(t("DismissGroupSuc")))
+      .catch((err) => message.error(t("DismissGroupFailed")));
+  };
 
   const inviteToGroup = () => {
     events.emit(OPENGROUPMODAL, "invite", groupMembers, curCve.groupID);
@@ -47,7 +49,6 @@ const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeT
   const delInGroup = () => {
     events.emit(OPENGROUPMODAL, "remove", groupMembers, curCve.groupID);
   };
-  
 
   return (
     <div className="group_drawer">
@@ -117,14 +118,14 @@ const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeT
       </div>
       <div className="group_drawer_item group_drawer_item_nbtm">
         <div>{t("NotDisturb")}</div>
-        <Switch checked={curCve.recvMsgOpt!==OptType.Nomal} size="small" onChange={updateOpt} />
+        <Switch checked={curCve.recvMsgOpt !== OptType.Nomal} size="small" onChange={updateOpt} />
       </div>
       <div className="group_drawer_btns">
         <Button onClick={quitGroup} danger className="group_drawer_btns_item">
           {t("QuitGroup")}
         </Button>
         {role === GroupRole.OWNER ? (
-          <Button  onClick={dissolveGroup} type="primary" danger className="group_drawer_btns_item">
+          <Button onClick={dissolveGroup} type="primary" danger className="group_drawer_btns_item">
             {t("DissolveGroup")}
           </Button>
         ) : null}

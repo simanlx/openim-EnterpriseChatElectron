@@ -71,6 +71,10 @@ export const parseMessageType = (pmsg: MessageItem, curUid?: string): string => 
       const groupUpdateDetail = JSON.parse(pmsg.notificationElem.detail);
       const groupUpdateUser = groupUpdateDetail.opUser;
       return `${isSelf(groupUpdateUser.userID) ? t("You") : groupUpdateUser.nickname}${t("ModifiedGroup")}`;
+    case tipsTypes.GROUPDISMISSED:
+      const dismissDetails = JSON.parse(pmsg.notificationElem.detail);
+      const dismissUser = dismissDetails.opUser;
+      return `${isSelf(dismissUser.userID) ? t("You") : dismissUser.nickname}${t("DismissedGroup")}`;
     default:
       return pmsg.notificationElem.defaultTips;
   }
