@@ -92,6 +92,7 @@ enum CbEvents {
     ONRECVNEWMESSAGE = "OnRecvNewMessage",
     ONRECVMESSAGEREVOKED = "OnRecvMessageRevoked",
     ONRECVC2CREADRECEIPT = "OnRecvC2CReadReceipt",
+    ONRECVGROUPREADRECEIPT = "OnRecvGroupReadReceipt",
     ONCONVERSATIONCHANGED = "OnConversationChanged",
     ONNEWCONVERSATION = "OnNewConversation",
     ONSYNCSERVERFAILED = "OnSyncServerFailed",

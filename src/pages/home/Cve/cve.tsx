@@ -100,9 +100,11 @@ const Home = () => {
   useEffect(() => {
     im.on(CbEvents.ONRECVMESSAGEREVOKED, revokeMsgHandler);
     im.on(CbEvents.ONRECVC2CREADRECEIPT, c2cMsgHandler);
+    im.on(CbEvents.ONRECVGROUPREADRECEIPT, groupMsgHandler)
     return () => {
       im.off(CbEvents.ONRECVMESSAGEREVOKED, revokeMsgHandler);
       im.off(CbEvents.ONRECVC2CREADRECEIPT, c2cMsgHandler);
+      im.off(CbEvents.ONRECVGROUPREADRECEIPT, groupMsgHandler)
     };
   }, []);
 
@@ -146,6 +148,30 @@ const Home = () => {
       .then((cve) => clickItem(cve))
       .catch((err) => message.error(t("GetCveFailed")));
   };
+
+  const groupMsgHandler = (data: any) => {
+    const val = JSON.parse(data.data)
+    console.log(curCve?.groupID,val)
+    console.log(curCve)
+    val.forEach((obj: any) => {
+      if (obj.groupID === curCve?.groupID) {
+        // console.log(obj.msgIDList)
+        rs.historyMsgList.forEach(item => {
+          
+          if (item.clientMsgID === obj.msgIDList[0]) {
+            if(item.attachedInfoElem.groupHasReadInfo.hasReadUserIDList === null) {
+              item.attachedInfoElem.groupHasReadInfo.hasReadUserIDList = []
+            }
+            item.attachedInfoElem.groupHasReadInfo.hasReadCount += 1 
+            item.attachedInfoElem.groupHasReadInfo.hasReadUserIDList = [
+              ...item.attachedInfoElem.groupHasReadInfo.hasReadUserIDList,
+              obj.userID
+            ]
+          }
+        })
+      }
+    })
+  }
 
   const sendForwardHandler = (options: string | MergerMsgParams, type: messageTypes, list: SelectType[]) => {
     list.map(async (s) => {

@@ -198,6 +198,11 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
           ...otherUserEmoji
         ]
         localStorage.setItem('userEmoji', JSON.stringify(allUserEmoji))
+        const newData = JSON.parse(localStorage.getItem('userEmoji')!) // 获取本地新表情包
+        const newFace = newData.filter((item: any) => {
+          return item.userID === String(userId)
+        })
+        setEmojiMap(newFace[0].emoji)
       })
       .catch((err) => message.error(t("UploadFailed")));
   };

@@ -456,6 +456,7 @@ export type MessageItem = {
   status: number;
   offlinePush: OfflinePush;
   attachedInfo: string;
+  attachedInfoElem: AttachedInfoElem
   ex: string;
   pictureElem: PictureElem;
   soundElem: SoundElem;
@@ -526,6 +527,15 @@ export type PictureElem = {
   bigPicture: Picture;
   snapshotPicture: Picture;
 };
+
+export type AttachedInfoElem = {
+  groupHasReadInfo: GroupHasReadInfo
+}
+
+export type GroupHasReadInfo = {
+  hasReadCount: number;
+  hasReadUserIDList: string[];
+}
 
 export type Picture = {
   uuid: string;

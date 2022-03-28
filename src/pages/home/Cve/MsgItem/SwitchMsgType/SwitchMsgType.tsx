@@ -186,7 +186,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
       case messageTypes.FACEMESSAGE:
         const faceData = JSON.parse(msg.faceElem.data)
         return (
-          <div className={`chat_bg_msg_content_pic ${!isSingle ? "nick_magin" : ""}`}>
+          <div className={`chat_bg_msg_content_face ${!isSingle ? "nick_magin" : ""}`}>
             <Image
               placeholder={true}
               style={{maxWidth: 200,maxHeight:200}}
