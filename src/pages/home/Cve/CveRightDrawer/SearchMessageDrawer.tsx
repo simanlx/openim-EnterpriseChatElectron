@@ -21,23 +21,23 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
 
   const tabChange = (key: string) => {
     setActiveKey(key);
-    if(key === "101") return;
-    searchMessage("",Number(key))
+    if (key === "101") return;
+    searchMessage("", Number(key));
   };
 
-  const searchMessage = (key: string,type?:number) => {
-    if(key===""&&!type) return;
+  const searchMessage = (key: string, type?: number) => {
+    if (key === "" && !type) return;
     const options = {
       sourceID: curCve.conversationType === SessionType.SINGLECVE ? curCve.userID : curCve.groupID,
       sessionType: curCve.conversationType,
       keywordList: type ? [] : [key],
       keywordListMatchType: 0,
       senderUserIDList: [],
-      messageTypeList: type? [type] : [],
+      messageTypeList: type ? [type] : [],
       searchTimePosition: 0,
       searchTimePeriod: 0,
       pageIndex: 1,
-      count:200
+      count: 200,
     };
     im.searchLocalMessages(options).then((res) => {
       console.log(JSON.parse(res.data));
@@ -61,15 +61,13 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
 };
 
 interface MyTabpaneProps extends TabPaneProps {
-  debounceSearch: (key: string,type?:number) => void;
+  debounceSearch: (key: string, type?: number) => void;
 }
 
 const MyTabpane: FC<MyTabpaneProps> = (props) => {
   const { t } = useTranslation();
 
   const inputOnChange = (key: React.ChangeEvent<HTMLInputElement>) => props.debounceSearch(key.target.value);
-
-  
 
   return (
     <Tabs.TabPane {...props}>
@@ -100,7 +98,7 @@ const TextMessageList = () => {
   return (
     <div className="text_message_list">
       {/* <TextMessageItem /> */}
-      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")}/>
+      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")} />
     </div>
   );
 };
