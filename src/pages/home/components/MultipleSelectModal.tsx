@@ -6,12 +6,11 @@ import { RootState } from "../../../store";
 import { shallowEqual } from "@babel/types";
 import { useReactive } from "ahooks";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-import { cosUpload, events, im } from "../../../utils";
+import { events, im, switchUpload } from "../../../utils";
 import { GETRTCINVITEIDS, SENDFORWARDMSG } from "../../../constants/events";
 import { messageTypes } from "../../../constants/messageContentType";
 import { useTranslation } from "react-i18next";
 import { GroupMemberItem, Member } from "../../../utils/open_im_sdk/types";
-import { getCosAuthorization } from "../../../utils/cos";
 import SelectBox, { SelectFriendItem, SelectGroupItem, SelectMemberItem, SelectType } from "./SelectBox";
 import { ModalType } from "../../../@types/open_im";
 
@@ -96,12 +95,10 @@ const MultipleSelectModal: FC<MultipleSelectModalProps> = ({ visible, modalType,
   };
 
   const uploadIcon = async (uploadData: UploadRequestOption) => {
-    await getCosAuthorization();
-    cosUpload(uploadData)
-      .then((res) => {
-        rs.groupIcon = res.url;
-      })
-      .catch((err) => message.error(t("UploadFailed")));
+    switchUpload(uploadData).then((res) => {
+      rs.groupIcon = res.data.URL;
+    })
+    .catch((err) => message.error(t("UploadFailed")));
   };
 
   const modalOperation = () => {

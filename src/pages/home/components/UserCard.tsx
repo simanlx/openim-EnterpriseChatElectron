@@ -4,18 +4,16 @@ import { FC, useState, useRef, useEffect } from "react";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { cosUpload, events, im } from "../../../utils";
+import { events, im, switchUpload } from "../../../utils";
 import self_card from "@/assets/images/self_card.png";
 import del_card from "@/assets/images/del_card.png";
 import { MyAvatar } from "../../../components/MyAvatar";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-import { getSelfInfo } from "../../../store/actions/user";
 import { getFriendList } from "../../../store/actions/contacts";
 import { TOASSIGNCVE, UPDATEFRIENDCARD } from "../../../constants/events";
 import { SessionType } from "../../../constants/messageContentType";
 import { useTranslation } from "react-i18next";
 import { PublicUserItem, FriendItem, PartialUserItem, FullUserItem } from "../../../utils/open_im_sdk/types";
-import { getCosAuthorization } from "../../../utils/cos";
 
 const { Paragraph } = Typography;
 
@@ -126,11 +124,10 @@ const UserCard: FC<UserCardProps> = ({ draggableCardVisible, info, close, type }
   };
 
   const uploadIcon = async (uploadData: UploadRequestOption) => {
-    await getCosAuthorization();
-    cosUpload(uploadData)
+    switchUpload(uploadData)
       .then((res) => {
         selfInfo = { userID: selfID };
-        selfInfo.faceURL = res.url;
+        selfInfo.faceURL = res.data.URL;
         updateSelfInfo();
       })
       .catch((err) => message.error(t("UploadFailed")));

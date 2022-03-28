@@ -1,7 +1,7 @@
 import { CloseCircleFilled, CloseOutlined } from "@ant-design/icons";
 import { Button, Layout, message } from "antd";
 import { FC, memo, useEffect, useRef, useState } from "react";
-import { base64toFile, contenteditableDivRange, cosUploadNomal, events, im, isSingleCve, move2end } from "../../../../utils";
+import { base64toFile, contenteditableDivRange, events, im, isSingleCve, move2end, switchUpload } from "../../../../utils";
 import { messageTypes } from "../../../../constants/messageContentType";
 import { ATSTATEUPDATE, FORWARDANDMERMSG, ISSETDRAFT, MUTILMSG, MUTILMSGCHANGE, REPLAYMSG } from "../../../../constants/events";
 import CardMsgModal from "../components/CardMsgModal";
@@ -13,8 +13,8 @@ import { useTranslation } from "react-i18next";
 import ContentEditable, { ContentEditableEvent } from "../../../../components/EdtableDiv";
 import { useLatest } from "ahooks";
 import { ConversationItem, FriendItem, MessageItem } from "../../../../utils/open_im_sdk/types";
-import { getCosAuthorization } from "../../../../utils/cos";
 import { CustomEmojiType, FaceType } from "../../../../@types/open_im";
+import { minioUploadType } from "../../../../api/admin";
 
 const { Footer } = Layout;
 
@@ -282,15 +282,15 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     setDraft(curCve);
   };
 
-  const faceClick = async(face: typeof faceMap[0] | CustomEmojiType, type: FaceType) => {
-    if (type === 'emoji') {
+  const faceClick = async (face: typeof faceMap[0] | CustomEmojiType, type: FaceType) => {
+    if (type === "emoji") {
       const faceEl = `<img class="face_el" alt="${(face as typeof faceMap[0]).context}" style="padding-right:2px" width="24px" src="${(face as typeof faceMap[0]).src}">`;
       move2end(inputRef.current!.el);
       setMsgContent(latestContent.current + faceEl);
     } else {
       // console.log(face)
-      const {data} = await im.createFaceMessage({index: -1,data: JSON.stringify(face)})
-      sendMsg(data,messageTypes.FACEMESSAGE)
+      const { data } = await im.createFaceMessage({ index: -1, data: JSON.stringify(face) });
+      sendMsg(data, messageTypes.FACEMESSAGE);
     }
   };
 
@@ -317,9 +317,10 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
       screenshotEls[screenshotEls.length - 1].alt = "last";
       screenshotEls.map(async (snel) => {
         const item = base64toFile(snel.src);
-        await getCosAuthorization();
-        const { url } = await cosUploadNomal(item);
-        await suffixRef.current.sendImageMsg(item, url);
+        const {
+          data: { URL },
+        } = await switchUpload(item as any, minioUploadType.picture,true);
+        await suffixRef.current.sendImageMsg(item, URL);
         if (snel.alt === "last") {
           reSet();
         }

@@ -3,15 +3,12 @@ import { LeftOutlined } from "@ant-design/icons";
 import { FC, useEffect, useState } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { useToggle } from "ahooks";
-import { findEmptyValue } from "../../../utils/common";
-import { cosUpload } from "../../../utils";
+import { findEmptyValue, switchUpload } from "../../../utils/common";
 import { MyAvatar } from "../../../components/MyAvatar";
 import CodeBox from "./CodeBox";
 
 import { useTranslation } from "react-i18next";
 import { Itype } from "../../../@types/open_im";
-import { getCosAuthorization } from "../../../utils/cos";
-import { sendSms } from "../../../api/login";
 
 const { Option } = Select;
 
@@ -179,8 +176,7 @@ const LoginForm: FC<IProps> = (props) => {
   );
 
   const cusromUpload = async (data: UploadRequestOption) => {
-    await getCosAuthorization();
-    cosUpload(data).then((res) => setSInfo({ ...sInfo, faceURL: res.url }));
+    switchUpload(data).then((res) => setSInfo({ ...sInfo, faceURL: res.data.URL }));
   };
 
   const setInfo = (

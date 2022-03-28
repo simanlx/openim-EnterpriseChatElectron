@@ -140,6 +140,15 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("JoinedGroup")}
           </>
         );
+      case tipsTypes.GROUPDISMISSED:
+        const dismissDetails = JSON.parse(msg.notificationElem.detail);
+        const dismissUser = dismissDetails.opUser;
+        return (
+          <>
+            <b onClick={() => window.userClick(dismissUser.userID)}>{isSelf(dismissUser.userID) ? t("You") : dismissUser.nickname}</b>
+            {t("DismissedGroup")}
+          </>
+        );
       default:
         return JSON.parse(msg.content).defaultTips;
     }

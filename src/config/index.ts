@@ -17,6 +17,7 @@ export const ADMINURL = "http://43.128.5.63:10000"
 
 export const AXIOSTIMEOUT = 60000
 
+export const OBJECTSTORAGE:"cos"|"minio" = "minio"
 export const PICMESSAGETHUMOPTION = "?imageView2/1/w/200/h/200/rq/80"
 export const LANGUAGE = "zh-cn"
 

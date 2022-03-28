@@ -7,8 +7,12 @@ import file_xslx from "@/assets/images/file_xslx.png";
 import file_zip from "@/assets/images/file_zip.png";
 import { RcFile } from "antd/lib/upload";
 import axios from "axios";
+import { UploadRequestOption } from "rc-upload/lib/interface";
+import { minioUpload, minioUploadType } from "../api/admin";
+import { OBJECTSTORAGE } from "../config";
+import { cosUpload, cosUploadNomal, getCosAuthorization } from "./cos";
 
-const PinYin: any= {
+const PinYin: any = {
   a: "\u554a\u963f\u9515",
   ai: "\u57c3\u6328\u54ce\u5509\u54c0\u7691\u764c\u853c\u77ee\u827e\u788d\u7231\u9698\u8bf6\u6371\u55f3\u55cc\u5ad2\u7477\u66a7\u7839\u953f\u972d",
   an: "\u978d\u6c28\u5b89\u4ffa\u6309\u6697\u5cb8\u80fa\u6848\u8c19\u57ef\u63de\u72b4\u5eb5\u6849\u94f5\u9e4c\u9878\u9eef",
@@ -423,9 +427,8 @@ export const findEmptyValue = (obj: any) => {
   return flag;
 };
 
-export const pySegSort = (data:any[], key:string="nickname") => {
-
-  const ucfirst = (l1:any) => {
+export const pySegSort = (data: any[], key: string = "nickname") => {
+  const ucfirst = (l1: any) => {
     if (l1.length > 0) {
       var first = l1.substr(0, 1).toUpperCase();
       var spare = l1.substr(1, l1.length);
@@ -433,7 +436,7 @@ export const pySegSort = (data:any[], key:string="nickname") => {
     }
   };
 
-  const arraySearch = (l1:any, l2:any) => {
+  const arraySearch = (l1: any, l2: any) => {
     for (var name in PinYin) {
       if (PinYin[name].indexOf(l1) != -1) {
         return ucfirst(name);
@@ -443,7 +446,7 @@ export const pySegSort = (data:any[], key:string="nickname") => {
     return false;
   };
 
-  const codefans = (l1:any) => {
+  const codefans = (l1: any) => {
     var l2 = l1.length;
     var I1 = "";
     var reg = new RegExp("[a-zA-Z0-9- ]");
@@ -478,7 +481,7 @@ export const pySegSort = (data:any[], key:string="nickname") => {
     }
   }
 
-  var dataSort:any[] = [];
+  var dataSort: any[] = [];
   for (var i = 0; i < arrlist.length; i++) {
     dataSort[i] = { initial: arrlist[i] };
     dataSort[i].data = [];
@@ -497,20 +500,20 @@ export const pySegSort = (data:any[], key:string="nickname") => {
       }
     }
   }
-  const NomalInitial = "QWERTYUIOPLKJHGFDSAZXCVBNM".split('')
+  const NomalInitial = "QWERTYUIOPLKJHGFDSAZXCVBNM".split("");
   const special = {
-    initial:"#",
-    data:[]
-  }
-  const newFilterData = dataSort.filter(d=>{
-    if(!NomalInitial.includes(d.initial)){
-      special.data = [...special.data,...d.data] as any;
-    }else{
-      return d
+    initial: "#",
+    data: [],
+  };
+  const newFilterData = dataSort.filter((d) => {
+    if (!NomalInitial.includes(d.initial)) {
+      special.data = [...special.data, ...d.data] as any;
+    } else {
+      return d;
     }
-  })
-  if(special.data.length>0){
-    newFilterData.push(special)
+  });
+  if (special.data.length > 0) {
+    newFilterData.push(special);
   }
   return newFilterData;
 };
@@ -752,9 +755,9 @@ export const watermark = (config: WaterMarkConfig) => {
     textBaseline = "middle",
     font = "16px Microsoft Yahei",
     fillStyle = "rgba(184, 184, 184, 0.4)",
-    content="",
-    rotate=24,
-    zIndex="1000",
+    content = "",
+    rotate = 24,
+    zIndex = "1000",
   } = config;
   const canvas = document.createElement("canvas");
 
@@ -810,5 +813,14 @@ export const watermark = (config: WaterMarkConfig) => {
       subtree: true,
       childList: true,
     });
+  }
+};
+
+export const switchUpload = async (uploadData: UploadRequestOption, fileType: minioUploadType = minioUploadType.picture, isNomal: boolean = false, snapShot?: RcFile) => {
+  if (OBJECTSTORAGE === "minio") {
+    return minioUpload(isNomal ? { file: uploadData } as any : uploadData, fileType);
+  } else {
+    await getCosAuthorization();
+    return isNomal ? cosUploadNomal(uploadData as unknown as File) : cosUpload(uploadData);
   }
 };

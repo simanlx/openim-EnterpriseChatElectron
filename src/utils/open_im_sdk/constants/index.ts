@@ -69,6 +69,7 @@ enum RequestFunc {
     GETGROUPSINFO="GetGroupsInfo",
     JOINGROUP="JoinGroup",
     QUITGROUP="QuitGroup",
+    DISMISSGROUP="DismissGroup",
     TRANSFERGROUPOWNER="TransferGroupOwner",
     GETSENDGROUPAPPLICATIONLIST="GetSendGroupApplicationList",
     GETRECVGROUPAPPLICATIONLIST="GetRecvGroupApplicationList",
