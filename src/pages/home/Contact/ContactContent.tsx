@@ -13,6 +13,7 @@ import { MenuItem } from "./ContactMenuList";
 import GroupList from "./GroupList";
 import LabelList from "./LabelList";
 import NewNotice from "./NewNotice";
+import Organizational from "./Organizational";
 
 type ContactContentProps = {
   menu: MenuItem;
@@ -159,6 +160,10 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
         return <GroupList groupList={searchFlag ? (contacts as GroupItem[]) : groupList} clickItem={clickListItem} />;
       case 5:
         return <LabelList />;
+      case 6:
+      case 7:
+      case 8:
+        return <Organizational selfDepartment= {menu.title} />;
       default:
         return null;
     }

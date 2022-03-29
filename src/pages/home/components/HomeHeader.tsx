@@ -21,7 +21,7 @@ const { Header } = Layout;
 type HeaderProps = {
   isShowBt?: boolean;
   type: "chat" | "contact";
-  title?: string;
+  title?: string | any;
   curCve?: ConversationItem;
   typing?: boolean;
   ginfo?: GroupItem;
@@ -207,7 +207,7 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
 
     return (
       <div className="chat_header_box chat_header_cons">
-        <div>{title}</div>
+        <div style={{width: '100%'}}>{title}</div>
         {selectAble && (
           <Select onSelect={onSelect} defaultValue="recv" style={{ width: 120 }} allowClear>
             <Select.Option value="recv">{recvLable}</Select.Option>

@@ -37,6 +37,7 @@ export enum tipsTypes {
   MEMBERKICKED = 1508,
   MEMBERINVITED = 1509,
   MEMBERENTER = 1510,
+  GROUPDISMISSED = 1511,
 }
 
 export enum customType {

@@ -100,11 +100,9 @@ const Home = () => {
   useEffect(() => {
     im.on(CbEvents.ONRECVMESSAGEREVOKED, revokeMsgHandler);
     im.on(CbEvents.ONRECVC2CREADRECEIPT, c2cMsgHandler);
-    im.on(CbEvents.ONRECVGROUPREADRECEIPT, groupMsgHandler)
     return () => {
       im.off(CbEvents.ONRECVMESSAGEREVOKED, revokeMsgHandler);
       im.off(CbEvents.ONRECVC2CREADRECEIPT, c2cMsgHandler);
-      im.off(CbEvents.ONRECVGROUPREADRECEIPT, groupMsgHandler)
     };
   }, []);
 
@@ -129,10 +127,12 @@ const Home = () => {
     events.on(SENDFORWARDMSG, sendForwardHandler);
     events.on(TOASSIGNCVE, assignHandler);
     im.on(CbEvents.ONRECVNEWMESSAGE, newMsgHandler);
+    im.on(CbEvents.ONRECVGROUPREADRECEIPT, groupMsgHandler)
     return () => {
       events.off(SENDFORWARDMSG, sendForwardHandler);
       events.off(TOASSIGNCVE, assignHandler);
       im.off(CbEvents.ONRECVNEWMESSAGE, newMsgHandler);
+      im.off(CbEvents.ONRECVGROUPREADRECEIPT, groupMsgHandler)
     };
   }, [curCve]);
 

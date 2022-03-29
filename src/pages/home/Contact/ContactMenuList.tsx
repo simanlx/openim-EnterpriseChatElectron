@@ -8,6 +8,7 @@ type ConsMenuItemProps = {
   menu: MenuItem;
   onClick: (menu: MenuItem) => void;
   curTab: string;
+  menu2: MenuItem;
 };
 
 const ConsMenuItem: FC<ConsMenuItemProps> = ({ menu, onClick, curTab }) => {
@@ -81,23 +82,40 @@ type ContactListProps = {
   menus: MenuItem[];
   menusClick: (menu: MenuItem) => void;
   curTab: string;
+  menu2: MenuItem[];
 };
 
 const ContactMenuList: FC<ContactListProps> = ({
   menus,
   menusClick,
   curTab,
+  menu2
 }) => {
   return (
     <div className="cve_list">
       <List
+        className="other"
         itemLayout="horizontal"
         dataSource={menus}
         split={false}
         renderItem={(item) => (
-          <ConsMenuItem curTab={curTab} onClick={menusClick} menu={item} />
+          <ConsMenuItem curTab={curTab} onClick={menusClick} menu={item} menu2={item}/>
         )}
       />
+      <div className="organizational">
+        <span className="logo"></span>
+        <span className="title">托云信息技术有限公司</span>
+      </div>
+      <div className="organizational_box">
+        <List
+          itemLayout="horizontal"
+          dataSource={menu2}
+          split={false}
+          renderItem={(item) => (
+            <ConsMenuItem curTab={curTab} onClick={menusClick} menu={item} menu2={item} />
+          )}
+        />
+      </div>
     </div>
   );
 };
