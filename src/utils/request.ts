@@ -21,7 +21,7 @@ request.interceptors.request.use( (config) => {
 
 request.interceptors.response.use( (response) => {
   const res = response.data
-  if(res.errCode===0 || res.errCode===10007 || res.errCode=== 10008){
+  if(res.errCode===0 || res.errCode===10007 || res.errCode=== 10008 || res.code === 200){
     return res;
   }else{
     // message.error(res.errMsg || '操作失败，请稍后再试！');

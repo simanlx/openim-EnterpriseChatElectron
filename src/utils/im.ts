@@ -39,6 +39,8 @@ export const parseMessageType = (pmsg: MessageItem, curUid?: string): string => 
       return t("CustomMessage");
     case messageTypes.QUOTEMESSAGE:
       return t("QuoteMessage");
+    case messageTypes.FACEMESSAGE:
+      return t("FaceMessage");
     case tipsTypes.FRIENDADDED:
       return t("AlreadyFriend");
     case tipsTypes.MEMBERENTER:
