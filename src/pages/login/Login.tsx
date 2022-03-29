@@ -27,6 +27,7 @@ import {
 import IMConfigModal from "./components/IMConfigModal";
 import TopBar from "../../components/TopBar";
 import { InitConfig } from "../../utils/open_im_sdk/types";
+import { getAccessToken, getBusinessToken } from "../../api/world_window";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -38,8 +39,6 @@ const Login = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { value: type, setValue: setType, back } = useHistoryTravel<Itype>("login");
   const lastType = useLatest(type);
-
-  
 
   const finish = (values?: FormField | string | InfoField) => {
     switch (lastType.current) {
@@ -64,7 +63,7 @@ const Login = () => {
               handleError(res);
             }
             setNum((values as FormField)?.phoneNo);
-              toggle(isModify ? "modifycode" : "vericode");
+            toggle(isModify ? "modifycode" : "vericode");
           })
           .catch((err) => handleError(err));
         break;
@@ -137,29 +136,34 @@ const Login = () => {
       });
   };
 
+  const thirdAuth = () => {
+    getBusinessToken("admin", "DuDr3rMace").then((res) => {
+      localStorage.setItem("BusinessToken", res.data.token);
+    });
+    getAccessToken().then((res) => {
+      localStorage.setItem("AccessToken", res.data.accessToken);
+    });
+  };
+
   const imLogin = async (userID: string, token: string) => {
     localStorage.setItem(`improfile`, token);
     localStorage.setItem(`curimuid`, userID);
     //pc
     localStorage.setItem(`lastimuid`, userID);
 
-    if (!localStorage.getItem('userEmoji')) {
-      localStorage.setItem('userEmoji', JSON.stringify([]))
+    if (!localStorage.getItem("userEmoji")) {
+      localStorage.setItem("userEmoji", JSON.stringify([]));
     }
     const userEmojiInfo = {
       userID,
       emoji: [],
-    }
-    const allUserEmoji = JSON.parse(localStorage.getItem('userEmoji')!)
-    const flag = allUserEmoji.some((item: any) => item?.userID === userID)
+    };
+    const allUserEmoji = JSON.parse(localStorage.getItem("userEmoji")!);
+    const flag = allUserEmoji.some((item: any) => item?.userID === userID);
     if (!flag) {
-      localStorage.setItem('userEmoji', JSON.stringify([
-        ...allUserEmoji,
-        userEmojiInfo
-      ]))
+      localStorage.setItem("userEmoji", JSON.stringify([...allUserEmoji, userEmojiInfo]));
     }
-    
-    
+
     let url = getIMUrl();
     let platformID = 5;
     if (window.electron) {
@@ -173,6 +177,7 @@ const Login = () => {
     };
     im.login(config)
       .then((res) => {
+        thirdAuth();
         dispatch(getSelfInfo());
         dispatch(getCveList());
         dispatch(getFriendList());
@@ -199,6 +204,8 @@ const Login = () => {
         return t("NotRegistered");
       case 10004:
         return t("PasswordErr");
+      case 10005:
+        return t("GetTokenErr");
       case 10006:
         return t("RepeatSendCode");
       case 10007:
