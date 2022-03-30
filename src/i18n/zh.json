@@ -315,5 +315,8 @@
     "CallVoiceTitle":"发起音频通话",
     "MessageRecipientList":"消息接收人列表",
     "PeopleUnRead":"人未读",
-    "PeopleReaded":"人已读"
+    "PeopleReaded":"人已读",
+    "AllReaded":"全部已读",
+    "OrganizationalStructure":"组织架构",
+    "ExitTheEnterprise":"退出该企业"
 }

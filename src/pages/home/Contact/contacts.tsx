@@ -8,6 +8,7 @@ import new_friend from "@/assets/images/new_friend.png";
 import new_group from "@/assets/images/new_group.png";
 import nomal_cons from "@/assets/images/nomal_cons.png";
 import label_icon from "@/assets/images/label_icon.png";
+import department_icon from "@/assets/images/organizational_department.png";
 import HomeHeader from "../components/HomeHeader";
 import ContactContent, { ContactContentHandler } from "./ContactContent";
 import { useTranslation } from "react-i18next";
@@ -60,6 +61,30 @@ const Contacts = () => {
       suffix: "lb",
     },
   ];
+
+  const organizationalList = [
+    {
+      title: t('OrganizationalStructure'),
+      icon: department_icon,
+      bgc: "",
+      idx: 6,
+      suffix: "os",
+    },
+    {
+      title: '技术部',
+      icon: department_icon,
+      bgc: "",
+      idx: 7,
+      suffix: "js",
+    },
+    {
+      title: '体验部',
+      icon: department_icon,
+      bgc: "",
+      idx: 8,
+      suffix: "ty",
+    },
+  ]
   const [menu, setMenu] = useState(consMenuList[3]);
   const ref = useRef<ContactContentHandler>(null);
 
@@ -67,15 +92,40 @@ const Contacts = () => {
     setMenu(item);
   };
 
+  const quit = () => {
+    Modal.confirm({
+      title: t('ExitTheEnterprise'),
+      closable:false,
+      maskClosable:true,
+      centered:true,
+      className:"warning_modal",
+      onOk: ()=>{}
+    })
+  }
+
+  const ContentTitle = () => (
+    <div className="organizational_title">
+      <div className="left">
+        <span className="organizational_title_logo"></span>
+        <span>托云信息技术有限公司</span>
+      </div>
+      <span className="quit" onClick={() => quit()}></span>
+    </div>
+  )
+
   const fn = ()=>{}
 
   return (
     <>
       <HomeSider searchCb={(v)=>ref.current?.searchCb(v,menu.idx)}>
-        <ContactMenuList curTab={menu.title} menusClick={clickMenuItem} menus={consMenuList} />
+        <ContactMenuList curTab={menu.title} menusClick={clickMenuItem} menus={consMenuList} menu2= {organizationalList} />
       </HomeSider>
       <Layout>
-        <HomeHeader title={menu.title} isShowBt={menu.idx !== 3 && menu.idx !== 0} type="contact" />
+        {
+          menu.idx < 6 
+          ? <HomeHeader title={menu.title} isShowBt={menu.idx !== 3 && menu.idx !== 0} type="contact" />
+          : <HomeHeader title={<ContentTitle />} isShowBt={menu.idx !== 3 && menu.idx !== 0} type="contact" />
+        }
         <Content className="total_content">
           <ContactContent ref={ref}  menu={menu} />
         </Content>

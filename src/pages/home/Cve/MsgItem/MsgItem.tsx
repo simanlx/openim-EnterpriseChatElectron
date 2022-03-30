@@ -267,7 +267,11 @@ const MsgItem: FC<MsgItemProps> = (props) => {
                   onVisibleChange={handleUnreadVisibleChange}
                   visible={unreadCardShow}
                   >
-                    {groupMemberTotal - readMembers + t('PeopleUnRead')}
+                    {
+                      groupMemberTotal - readMembers !== 0
+                      ? groupMemberTotal - readMembers + t('PeopleUnRead')
+                      : t('AllReaded')
+                    }
                   </Popover>
                 </div>
             }
