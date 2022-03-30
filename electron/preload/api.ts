@@ -22,14 +22,6 @@ const getPlatform = () => {
       return 5;
   }
 };
-{
-  let platform = 5;
-  if (process.platform === "darwin") {
-    platform = 4;
-  } else if (process.platform === "win32") {
-    platform = 3;
-  }
-}
 
 const getLocalWsAddress = () => {
   let ips = [];
@@ -91,7 +83,7 @@ const screenshot = () => {
 };
 
 export const api: API = {
-  platform:getPlatform(),
+  platform: getPlatform(),
   isMac,
   getLocalWsAddress,
   getIMConfig,

@@ -1,6 +1,7 @@
 // import { OpenIMSDK } from 'open-im-sdk'
 import { t } from "i18next";
 import { messageTypes, SessionType, tipsTypes } from "../constants/messageContentType";
+import { sec2Time } from "./common";
 import { OpenIMSDK } from "./open_im_sdk";
 import { ConversationItem, MessageItem } from "./open_im_sdk/types";
 
@@ -77,6 +78,25 @@ export const parseMessageType = (pmsg: MessageItem, curUid?: string): string => 
       const dismissDetails = JSON.parse(pmsg.notificationElem.detail);
       const dismissUser = dismissDetails.opUser;
       return `${isSelf(dismissUser.userID) ? t("You") : dismissUser.nickname}${t("DismissedGroup")}`;
+    case tipsTypes.GroupMuted:
+      const groupMutedDetails = JSON.parse(pmsg.notificationElem.detail);
+      const groupMuteOpUser = groupMutedDetails.opUser;
+      return `${isSelf(groupMuteOpUser.userID) ? t("You") : groupMuteOpUser.nickname}${t("MuteGroup")}`;
+    case tipsTypes.GroupCancelMuted:
+      const groupCancelMutedDetails = JSON.parse(pmsg.notificationElem.detail);
+      const groupCancelMuteOpUser = groupCancelMutedDetails.opUser;
+      return `${isSelf(groupCancelMuteOpUser.userID) ? t("You") : groupCancelMuteOpUser.nickname}${t("CancelMuteGroup")}`;
+    case tipsTypes.GroupMemberMuted:
+      const gmMutedDetails = JSON.parse(pmsg.notificationElem.detail);
+      const gmMuteOpUser = isSelf(gmMutedDetails.opUser.userID) ? t("You") : gmMutedDetails.opUser.nickname ;
+      const mutedUser = isSelf(gmMutedDetails.mutedUser.userID) ? t("You") : gmMutedDetails.mutedUser.nickname ;
+      const muteTime = sec2Time(gmMutedDetails.mutedSeconds) 
+      return t("MuteMemberGroup",{opUser:gmMuteOpUser,muteUser:mutedUser,muteTime});
+    case tipsTypes.GroupMemberCancelMuted:
+      const gmcMutedDetails = JSON.parse(pmsg.notificationElem.detail);
+      const gmcMuteOpUser = isSelf(gmcMutedDetails.opUser.userID) ? t("You") : gmcMutedDetails.opUser.nickname ;
+      const cmuteUser = isSelf(gmcMutedDetails.mutedUser.userID) ? t("You") : gmcMutedDetails.mutedUser.nickname ;
+      return t("CancelMuteMemberGroup",{cmuteUser,opUser:gmcMuteOpUser});      
     default:
       return pmsg.notificationElem.defaultTips;
   }

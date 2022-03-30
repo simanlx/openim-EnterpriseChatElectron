@@ -119,12 +119,12 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
   };
 
   const fetchMoreRegisters = () => {
-    const totalIDs = originList.id.length
-    const nextLength = originList.current+20
-    const nextIDs = originList.id.slice(originList.current,nextLength>totalIDs?totalIDs:nextLength)
-    
-    dispatch(getOriginInfoList(nextIDs,originList.current+20,[...originList.info]) as any)
-  }
+    const totalIDs = originList.id.length;
+    const nextLength = originList.current + 20;
+    const nextIDs = originList.id.slice(originList.current, nextLength > totalIDs ? totalIDs : nextLength);
+
+    dispatch(getOriginInfoList(nextIDs, originList.current + 20, [...originList.info]) as any);
+  };
 
   useImperativeHandle(ref, () => {
     return {
@@ -148,11 +148,19 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
             tmpList = sentGroupApplicationList;
           }
         }
-        tmpList?.sort((a,b)=>a.handleResult===0? -1 : 1)
+        tmpList?.sort((a, b) => (a.handleResult === 0 ? -1 : 1));
         return <NewNotice type={menu.idx} renderType={renderType} renderList={searchFlag ? contacts : tmpList} />;
       case 0:
-        const hasMore = originList.current < originList.id.length
-        return <ContactList hasMore={hasMore} length={originList.current} fetchMoreData={fetchMoreRegisters} clickItem={clickListItem} contactList={searchFlag ? (contacts as PublicUserItem[]) : originList.info} />;
+        const hasMore = originList.current < originList.id.length;
+        return (
+          <ContactList
+            hasMore={hasMore}
+            length={originList.current}
+            fetchMoreData={fetchMoreRegisters}
+            clickItem={clickListItem}
+            contactList={searchFlag ? (contacts as PublicUserItem[]) : originList.info}
+          />
+        );
       case 3:
         return <ContactList clickItem={clickListItem} contactList={searchFlag ? (contacts as FriendItem[]) : friendList} />;
       case 4:
