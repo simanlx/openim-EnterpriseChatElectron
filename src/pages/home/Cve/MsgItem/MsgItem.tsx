@@ -183,11 +183,11 @@ const MsgItem: FC<MsgItemProps> = (props) => {
           <span className="tip">{readMembers}</span>{t('PeopleReaded')}
           <div className="list">
             {
-              readMemberList.map(item => {
+              readMemberList.map((item, index) => {
                 if(item) {
                   const curMember = groupMemberStatus[item.userID]
                   return (
-                    <div className="list_item">
+                    <div className="list_item" key={index}>
                       <MyAvatar src={item.faceURL} size={38} />
                       <div className="info">
                         <span>{item.nickname}</span>
@@ -204,11 +204,11 @@ const MsgItem: FC<MsgItemProps> = (props) => {
           <span className="tip">{groupMemberTotal - readMembers}</span>{t('PeopleUnRead')}
           <div className="list">
             {
-              unReadMemberList.map(item => {
+              unReadMemberList.map((item, index) => {
                 if(item) {
                   const curMember = groupMemberStatus[item.userID]
                   return (
-                    <div className="list_item">
+                    <div className="list_item" key={index}>
                       <MyAvatar src={item.faceURL} size={38} />
                       <div className="info">
                         <span>{item.nickname}</span>

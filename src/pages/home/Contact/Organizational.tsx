@@ -2,6 +2,7 @@ import { RightOutlined } from '@ant-design/icons'
 import { Breadcrumb, Tag } from 'antd'
 import { t } from 'i18next'
 import React, { FC, useEffect, useState } from 'react'
+import { getDeptList, getDeptUserList } from '../../../api/world_window'
 import { MyAvatar } from '../../../components/MyAvatar'
 import DepartmentItem from './DepartmentItem'
 
@@ -10,9 +11,22 @@ type OrganizationalProps = {
 }
 
 const Organizational :FC<OrganizationalProps> = ({selfDepartment}) => {
-  const [showNavigation, setShowNavigation] = useState<boolean>(false)
-  const [department, setDepartment] = useState<string>()
+const [showNavigation, setShowNavigation] = useState<boolean>(false)
+const [department, setDepartment] = useState<string>()
   // const [showDepartmentItem, setShowDepartmentItem] = useState<boolean>(false)
+
+
+  useEffect(() => {
+    getDeptList()
+    .then(data => {
+      console.log(data)
+    })
+    console.log(0)
+    // getDeptUserList()
+    // .then(data => {
+    //   console.log(data)
+    // })
+  },[])
 
   useEffect(() => {
     if (selfDepartment === t('OrganizationalStructure')) {

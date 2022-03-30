@@ -6,16 +6,43 @@ import { useTranslation } from "react-i18next";
 import { debounce } from "throttle-debounce";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { SessionType } from "../../../../constants/messageContentType";
-import { im } from "../../../../utils";
+import { formatDate, im, s_to_hs } from "../../../../utils";
 import { ConversationItem } from "../../../../utils/open_im_sdk/types";
 import styles from "../../../../components/SearchBar/index.module.less";
 import file_zip from '../../../../assets/images/file_zip.png'
 
 const { Paragraph, Text } = Typography;
 
+type MessageContentPorps = {
+  senderNickname: string;
+  createTime: number;
+  senderFaceUrl: string;
+  content: string;
+}
+
+type PicContentProps = {
+  url: string;
+}
+
+type VideoContentProps = {
+  url: string;
+  duration: string;
+}
+
+type FileContentProps = {
+  name: string;
+  size: string;
+  senderNickname: string;
+  time: string;
+}
+
 export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) => {
   const [activeKey, setActiveKey] = useState("101");
   const { t } = useTranslation();
+  const [messageContent, setMessageContent] = useState<MessageContentPorps[]>([])
+  const [picContent, setPicContent] = useState<PicContentProps[]>([])
+  const [videoContent, setVideoContent] = useState<VideoContentProps[]>([])
+  const [fileContent, setFileContent] = useState<FileContentProps[]>([])
 
   useEffect(() => {
     setTimeout(() => {
@@ -46,6 +73,54 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
     };
     im.searchLocalMessages(options).then((res) => {
       console.log(JSON.parse(res.data));
+      const searchInfo = JSON.parse(res.data)
+      const haveData = searchInfo.searchResultItems[0].messageList
+      switch (type) {
+        case 102:
+          if (!haveData) {
+            setPicContent([])
+            return false
+          }
+          const picData = haveData.map((item: any) => {
+            return {
+              url: item.pictureElem.snapshotPicture.url
+            }
+          })
+          setPicContent(picData)
+          break;
+        case 104:
+          if (!haveData) {
+            setVideoContent([])
+            return false
+          }
+          const videoData = haveData.map((item: any) => {
+            console.log(s_to_hs(item.videoElem.duration))
+            return {
+              url: item.videoElem.snapshotPath,
+              duration: s_to_hs(item.videoElem.duration)
+            }
+          })
+          setVideoContent(videoData)
+          break;
+        case 105:
+          console.log(type)
+          break;
+        default:
+          if (!haveData) {
+            setMessageContent([])
+            return false
+          }
+          const messageData = haveData.map((item: any) => {
+            return {
+              senderNickname: item.senderNickname,
+              createTime: formatDate(item.createTime)[3] + ' ' + formatDate(item.createTime)[4],
+              senderFaceUrl: item.senderFaceUrl,
+              content: item.content
+            }
+          })
+          setMessageContent(messageData)
+          break; 
+      }
     });
   };
 
@@ -55,16 +130,16 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
     <div className="search_message">
       <Tabs activeKey={activeKey} defaultActiveKey="101" onChange={tabChange}>
         <MyTabpane debounceSearch={debounceSearch} tab="消息" key="101">
-          <TextMessageList />
+          <TextMessageList messageContent={messageContent} />
         </MyTabpane>
         <MyTabpane debounceSearch={debounceSearch} tab="图片" key="102">
-          <PicMessageList />
+          <PicMessageList picContent={picContent} />
         </MyTabpane>
         <MyTabpane debounceSearch={debounceSearch} tab="视频" key="104">
-          <VideoMessageList />
+          <VideoMessageList videoContent={videoContent} />
         </MyTabpane>
         <MyTabpane debounceSearch={debounceSearch} tab="文件" key="105">
-          <FileMessageList />
+          <FileMessageList fileContent={fileContent} />
         </MyTabpane>
       </Tabs>
     </div>
@@ -83,14 +158,14 @@ const MyTabpane: FC<MyTabpaneProps> = (props) => {
   return (
     <Tabs.TabPane {...props}>
       <div className="message_search_input">
-        <Input onChange={inputOnChange} placeholder={t('Search')} prefix={<SearchOutlined />} />
+        <Input onChange={inputOnChange} placeholder={t('Search')} disabled= {props.tabKey !== "101" ? true : false} prefix={<SearchOutlined />} />
       </div>
       {props.children}
     </Tabs.TabPane>
   );
 };
 
-const TextMessageList = () => {
+const TextMessageList = ({messageContent}: any) => {
   const { t } = useTranslation();
 
   const TextMessageItem = () => (
@@ -109,34 +184,43 @@ const TextMessageList = () => {
   return (
     <div className="text_message_list">
       {/* <TextMessageItem /> */}
-      {/* <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")}/> */}
-      <ul className="content_list">
-        {
-          new Array(16).fill(null).map((item, index) => {
-            return  <li key={index}>
-              <MyAvatar src={''} size={38} />
-              <div className="info">
-                <div className="title">
-                  <span>姓名</span>
-                  <span>时间</span>
+      {
+        messageContent.length === 0
+        ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")}/>
+        : <ul className="content_list">
+          {
+            messageContent.map((item :MessageContentPorps, index : number) => {
+              return  <li key={index}>
+                <MyAvatar src={item.senderFaceUrl} size={38} />
+                <div className="info">
+                  <div className="title">
+                    <Text
+                      style={{maxWidth: "150px"}}
+                      ellipsis={{ tooltip: item.senderNickname }}
+                    >
+                      {item.senderNickname}
+                    </Text>
+                    {/* <span>{item.senderNickname}</span> */}
+                    <span>{item.createTime}</span>
+                  </div>
+                  <div className="content">
+                    <span>
+                      <Paragraph copyable={{ text: item.content }}>
+                        <Text
+                          style={{width: "220px"}}
+                          ellipsis={{ tooltip: item.content }}
+                        >
+                          {item.content}
+                        </Text>
+                      </Paragraph>
+                    </span>
+                  </div>
                 </div>
-                <div className="content">
-                  <span>
-                    <Paragraph copyable={{ text: 'Hello, Ant Design!' }}>
-                      <Text
-                        style={{width: "220px"}}
-                        ellipsis={{ tooltip: 'I am ellipsis now!' }}
-                      >
-                        Ant Design, a design language for background applications, is refined by Ant UED Team.This is a copyable text.
-                      </Text>
-                    </Paragraph>
-                  </span>
-                </div>
-              </div>
-            </li>
-          })
-        }
-      </ul>
+              </li>
+            })
+          }
+        </ul>
+      }
     </div>
   );
 };
@@ -154,109 +238,121 @@ const faceMenu = () => (
   </Menu>
 )
 
-const PicMessageList = () => {
+const PicMessageList = ({picContent}: any) => {
   return <div className="pic_message_list">
-    <div className="week">
-      <span>本周</span>
-      <div className="content">
-        {
-          new Array(6).fill(null).map((item, index) => {
-            return <div className="item" key={index}>
-              <Dropdown
-              overlay={faceMenu}
-              trigger={['contextMenu']}
-              placement='bottom'
-              >
-                <AntdImage
-                // preview={false}
-                style={{borderRadius: '5px'}}
-                height={80}
-                width={80}
-                src={'https://scpic1.chinaz.net/Files/pic/pic9/202203/apic39782_s.jpg'}
-                onContextMenu={() => {}}
-                />
-              </Dropdown>
-            </div>
-          })
-        }
-      </div>
-    </div>
-    <div className="month">
-    <span>本月</span>
-      <div className="content">
-        {
-          new Array(16).fill(null).map((item, index) => {
-            return <div className="item" key={index}>
-              <Dropdown
-              overlay={faceMenu}
-              trigger={['contextMenu']}
-              placement='bottom'
-              >
-                <AntdImage
-                // preview={false}
-                style={{borderRadius: '5px'}}
-                height={80}
-                width={80}
-                src={'https://scpic1.chinaz.net/Files/pic/pic9/202203/apic39782_s.jpg'}
-                onContextMenu={() => {}}
-                />
-              </Dropdown>
-            </div>
-          })
-        }
-      </div>
-    </div>
+    {
+      picContent.length === 0
+      ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")}/>
+      : <>
+        <div className="week">
+          {/* <span>本周</span> */}
+          <div className="content">
+            {
+              picContent.map((item:PicContentProps, index: number) => {
+                return <div className="item" key={index}>
+                  <Dropdown
+                  overlay={faceMenu}
+                  trigger={['contextMenu']}
+                  placement='bottom'
+                  >
+                    <AntdImage
+                    // preview={false}
+                    style={{borderRadius: '5px'}}
+                    height={80}
+                    width={80}
+                    src={item.url}
+                    onContextMenu={() => {}}
+                    />
+                  </Dropdown>
+                </div>
+              })
+            }
+          </div>
+        </div>
+        {/* <div className="month">
+          <span>本月</span>
+          <div className="content">
+            {
+              new Array(16).fill(null).map((item, index) => {
+                return <div className="item" key={index}>
+                  <Dropdown
+                  overlay={faceMenu}
+                  trigger={['contextMenu']}
+                  placement='bottom'
+                  >
+                    <AntdImage
+                    // preview={false}
+                    style={{borderRadius: '5px'}}
+                    height={80}
+                    width={80}
+                    src={'https://scpic1.chinaz.net/Files/pic/pic9/202203/apic39782_s.jpg'}
+                    onContextMenu={() => {}}
+                    />
+                  </Dropdown>
+                </div>
+              })
+            }
+          </div>
+        </div> */}
+      </>
+    }
   </div>
 }
 
-const VideoMessageList = () => {
+const VideoMessageList = ({videoContent}: any) => {
   return <div className="video_message_list">
-    <div className="week">
-      <span>本周</span>
-      <div className="content">
-        {
-          new Array(6).fill(null).map((item, index) => {
-            return <div className="item" key={index}>
-              <AntdImage
-              preview={false}
-              style={{borderRadius: '5px'}}
-              height={80}
-              width={80}
-              src={'https://scpic1.chinaz.net/Files/pic/pic9/202203/apic39782_s.jpg'}
-              onContextMenu={() => {}}
-              />
-              <div className="title">
-                <span></span>
-                <span>5:20</span>
-              </div>
-            </div>
-          })
-        }
-      </div>
-    </div>
-    <div className="month">
-    <span>本月</span>
-      <div className="content">
-        {
-          new Array(16).fill(null).map((item, index) => {
-            return <div className="item" key={index}>
-              <AntdImage
-              preview={false}
-              style={{borderRadius: '5px'}}
-              height={80}
-              width={80}
-              src={'https://scpic1.chinaz.net/Files/pic/pic9/202203/apic39782_s.jpg'}
-              onContextMenu={() => {}}
-              />
-              <div className="title">
-                <span></span>
-                <span>5:20</span>
-              </div>
-            </div>
-          })
-        }
-      </div>
-    </div>
+    {
+      videoContent.length === 0 
+      ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")}/>
+      : <>
+        <div className="week">
+          {/* <span>本周</span> */}
+          <div className="content">
+            {
+              videoContent.map((item: VideoContentProps, index: number) => {
+                return <div className="item" key={index}>
+                  <AntdImage
+                  preview={false}
+                  style={{borderRadius: '5px'}}
+                  height={80}
+                  width={80}
+                  src={item.url}
+                  onContextMenu={() => {}}
+                  />
+                  <div className="title">
+                    <span></span>
+                    <span>5:20</span>
+                  </div>
+                </div>
+              })
+            }
+          </div>
+        </div>
+        {/* <div className="month">
+          <span>本月</span>
+          <div className="content">
+            {
+              new Array(16).fill(null).map((item, index) => {
+                return <div className="item" key={index}>
+                  <AntdImage
+                  preview={false}
+                  style={{borderRadius: '5px'}}
+                  height={80}
+                  width={80}
+                  src={'https://scpic1.chinaz.net/Files/pic/pic9/202203/apic39782_s.jpg'}
+                  onContextMenu={() => {}}
+                  />
+                  <div className="title">
+                    <span></span>
+                    <span>5:20</span>
+                  </div>
+                </div>
+              })
+            }
+          </div>
+        </div> */}
+      </>
+    }
   </div>
 }
 
@@ -264,11 +360,14 @@ const downloadFile = () => {
   console.log("下载文件")
 }
 
-const FileMessageList = () => {
+const FileMessageList = ({fileContent}: any) => {
   return <div className="file_message_list">
-     <ul className="content_list">
+     {
+       fileContent.length === 0
+       ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t("EmptySearch")}/>
+       : <ul className="content_list">
         {
-          new Array(16).fill(null).map((item, index) => {
+          fileContent.map((item: FileContentProps, index: number) => {
             return  <li key={index}>
               <div className="box">
                 <img src={file_zip} alt="" style={{width: '38px',height:'44px'}}/>
@@ -287,5 +386,6 @@ const FileMessageList = () => {
           })
         }
       </ul>
+     }
   </div>
 }
