@@ -38,6 +38,10 @@ export enum tipsTypes {
   MEMBERINVITED = 1509,
   MEMBERENTER = 1510,
   GROUPDISMISSED = 1511,
+  GroupMemberMuted = 1512,
+  GroupMemberCancelMuted = 1513,
+  GroupMuted = 1514,
+  GroupCancelMuted = 1515,
 }
 
 export enum customType {

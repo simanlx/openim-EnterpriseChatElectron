@@ -62,7 +62,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
     const duration = await getVideoInfo(file);
     const videoInfo = {
       videoPath: url,
-      duration: parseInt(duration+''),
+      duration: parseInt(duration+""),
       videoType: file.type,
       snapshotPath: snp,
       videoUUID: file.uid,

@@ -70,6 +70,8 @@ enum RequestFunc {
     JOINGROUP="JoinGroup",
     QUITGROUP="QuitGroup",
     DISMISSGROUP="DismissGroup",
+    CHANGEGROUPMUTE="ChangeGroupMute",
+    CHANGEGROUPMEMBERMUTE="ChangeGroupMemberMute",
     TRANSFERGROUPOWNER="TransferGroupOwner",
     GETSENDGROUPAPPLICATIONLIST="GetSendGroupApplicationList",
     GETRECVGROUPAPPLICATIONLIST="GetRecvGroupApplicationList",

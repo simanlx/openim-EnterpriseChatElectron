@@ -1,5 +1,5 @@
 import { Layout, Modal } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import HomeSider from "../components/HomeSider";
 import ContactMenuList, { MenuItem } from "./ContactMenuList";
 import my_friend from "@/assets/images/my_friend.png";
@@ -9,18 +9,9 @@ import new_group from "@/assets/images/new_group.png";
 import nomal_cons from "@/assets/images/nomal_cons.png";
 import label_icon from "@/assets/images/label_icon.png";
 import department_icon from "@/assets/images/organizational_department.png";
-
-import { RootState } from "../../../store";
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import HomeHeader from "../components/HomeHeader";
 import ContactContent, { ContactContentHandler } from "./ContactContent";
-import { SessionType } from "../../../constants/messageContentType";
-import { events } from "../../../utils";
-import { TOASSIGNCVE } from "../../../constants/events";
-import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { setGroupMemberLoading } from "../../../store/actions/contacts";
-import { FriendItem, GroupItem } from "../../../utils/open_im_sdk/types";
 
 const { Content } = Layout;
 

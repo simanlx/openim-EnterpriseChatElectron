@@ -252,6 +252,17 @@ export type JoinGroupParams = {
   reqMsg: string;
 };
 
+export type ChangeGroupMuteParams = {
+  groupID: string;
+  isMute: boolean;
+}
+
+export type ChangeGroupMemberMuteParams = {
+  groupID: string;
+  userID: string;
+  mutedSeconds: number;
+}
+
 export type TransferGroupParams = {
   groupID: string;
   newOwnerUserID: string;

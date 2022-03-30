@@ -2,7 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { useSelector, shallowEqual } from "react-redux";
 import { tipsTypes } from "../../../constants/messageContentType";
 import { RootState } from "../../../store";
-import { events, im, isSingleCve } from "../../../utils";
+import { events, im, isSingleCve, sec2Time } from "../../../utils";
 import ScrollView from "../../../components/ScrollView";
 import { MUTILMSG, OPENSINGLEMODAL } from "../../../constants/events";
 import MsgItem from "./MsgItem/MsgItem";
@@ -99,7 +99,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
         invitedUserList.forEach((user: any) =>
           inviteUsers.push(
             <b onClick={() => window.userClick(user.userID)} key={user.userID}>
-              {isSelf(user.userID) ? t("You") : user.nickname +" "}
+              {isSelf(user.userID) ? t("You") : user.nickname + " "}
             </b>
           )
         );
@@ -149,6 +149,25 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("DismissedGroup")}
           </>
         );
+      case tipsTypes.GroupMuted:
+        const groupMutedDetails = JSON.parse(msg.notificationElem.detail);
+        const groupMuteOpUser = groupMutedDetails.opUser;
+        return `${isSelf(groupMuteOpUser.userID) ? t("You") : groupMuteOpUser.nickname}${t("MuteGroup")}`;
+      case tipsTypes.GroupCancelMuted:
+        const groupCancelMutedDetails = JSON.parse(msg.notificationElem.detail);
+        const groupCancelMuteOpUser = groupCancelMutedDetails.opUser;
+        return `${isSelf(groupCancelMuteOpUser.userID) ? t("You") : groupCancelMuteOpUser.nickname}${t("CancelMuteGroup")}`;
+      case tipsTypes.GroupMemberMuted:
+        const gmMutedDetails = JSON.parse(msg.notificationElem.detail);
+        const gmMuteOpUser = isSelf(gmMutedDetails.opUser.userID) ? t("You") : gmMutedDetails.opUser.nickname;
+        const mutedUser = isSelf(gmMutedDetails.mutedUser.userID) ? t("You") : gmMutedDetails.mutedUser.nickname;
+        const muteTime = sec2Time(gmMutedDetails.mutedSeconds);
+        return t("MuteMemberGroup", { opUser: gmMuteOpUser, muteUser: mutedUser, muteTime });
+      case tipsTypes.GroupMemberCancelMuted:
+        const gmcMutedDetails = JSON.parse(msg.notificationElem.detail);
+        const gmcMuteOpUser = isSelf(gmcMutedDetails.opUser.userID) ? t("You") : gmcMutedDetails.opUser.nickname;
+        const cmuteUser = isSelf(gmcMutedDetails.mutedUser.userID) ? t("You") : gmcMutedDetails.mutedUser.nickname;
+        return t("CancelMuteMemberGroup", { cmuteUser, opUser: gmcMuteOpUser });
       default:
         return JSON.parse(msg.content).defaultTips;
     }
@@ -169,17 +188,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
               </div>
             );
           } else {
-            return (
-              <MsgItem
-                audio={audioRef}
-                key={msg.clientMsgID}
-                mutilSelect={mutilSelect}
-                msg={msg}
-                imgClick={imgClick}
-                selfID={merID ?? selfID}
-                curCve={curCve!}
-              />
-            );
+            return <MsgItem audio={audioRef} key={msg.clientMsgID} mutilSelect={mutilSelect} msg={msg} imgClick={imgClick} selfID={merID ?? selfID} curCve={curCve!} />;
           }
         })}
       </ScrollView>

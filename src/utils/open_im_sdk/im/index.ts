@@ -43,6 +43,8 @@ import {
   RtcInvite,
   RtcActionParams,
   GroupMsgReadParams,
+  ChangeGroupMuteParams,
+  ChangeGroupMemberMuteParams,
 } from "../types";
 
 export default class OpenIMSDK extends Emitter {
@@ -1058,6 +1060,32 @@ export default class OpenIMSDK extends Emitter {
       const _uuid = operationID || uuid(this.uid as string);
       const args = {
         reqFuncName: RequestFunc.DISMISSGROUP,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  };
+
+  changeGroupMute = (data: ChangeGroupMuteParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.CHANGEGROUPMUTE,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  };
+
+  changeGroupMemberMute = (data: ChangeGroupMemberMuteParams, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.CHANGEGROUPMEMBERMUTE,
         operationID: _uuid,
         userID: this.uid,
         data,

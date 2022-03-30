@@ -689,28 +689,13 @@ export const move2end = (ref: React.RefObject<HTMLDivElement>) => {
 };
 
 export const downloadFileUtil = (filePath: string, filename: string) => {
-  axios
-    .get(filePath, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      responseType: "blob",
-    })
-    .then(function (response) {
-      const blob = new Blob([response.data]);
-      const fileName = filename;
-      const linkNode = document.createElement("a");
-      linkNode.download = fileName;
-      linkNode.style.display = "none";
-      linkNode.href = URL.createObjectURL(blob);
-      document.body.appendChild(linkNode);
-      linkNode.click();
-      URL.revokeObjectURL(linkNode.href);
-      document.body.removeChild(linkNode);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  const linkNode = document.createElement("a");
+  linkNode.download = filename;
+  linkNode.style.display = "none";
+  linkNode.href = filePath;
+  document.body.appendChild(linkNode);
+  linkNode.click();
+  document.body.removeChild(linkNode);
 };
 
 export const sec2Format = (seconds: number, dateFormat = "H:i:s") => {
@@ -732,6 +717,38 @@ export const sec2Format = (seconds: number, dateFormat = "H:i:s") => {
   }
   return dateFormat.replace("H", obj.H).replace("i", obj.i).replace("s", obj.s);
 };
+
+export const sec2Time = (seconds: number) => {
+  var theTime1 = 0;// min
+  var theTime2 = 0;// hour 
+  var theTime3 = 0;// day
+  if(seconds > 60) { 
+   theTime1 = parseInt((seconds / 60) as unknown as string); 
+   seconds = parseInt((seconds%60) as unknown as string); 
+   if(theTime1 > 60) { 
+    theTime2 = parseInt((theTime1/60)  as unknown as string); 
+    theTime1 = parseInt((theTime1%60) as unknown as string); 
+    if(theTime2 > 24){
+     theTime3 = parseInt((theTime2/24) as unknown as string);
+     theTime2 = parseInt((theTime2%24) as unknown as string);
+    }
+   } 
+  } 
+  var result = '';
+  if(seconds > 0){
+   result = ""+parseInt(seconds as unknown as string)+"秒";
+  }
+  if(theTime1 > 0) { 
+   result = ""+parseInt(theTime1 as unknown as string)+"分"+result; 
+  } 
+  if(theTime2 > 0) { 
+   result = ""+parseInt(theTime2 as unknown as string)+"小时"+result; 
+  } 
+  if(theTime3 > 0) { 
+   result = ""+parseInt(theTime3 as unknown as string)+"天"+result; 
+  }
+  return result; 
+}
 
 type WaterMarkConfig = {
   container?: HTMLElement;
