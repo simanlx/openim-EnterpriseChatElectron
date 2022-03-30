@@ -1,4 +1,4 @@
-import { Layout } from "antd";
+import { Layout, Modal } from "antd";
 import { useRef, useState } from "react";
 import HomeSider from "../components/HomeSider";
 import ContactMenuList, { MenuItem } from "./ContactMenuList";
