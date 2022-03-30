@@ -258,7 +258,8 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     text = parseImg(parseEmojiFace(text));
     text = parseBr(text);
     forEachImgMsg();
-    if (text === "") return;
+    const emptyWords = ["", "\n","\n\n"]
+    if (emptyWords.includes(text)) return;
     switch (type) {
       case "text":
         sendTextMsg(text);
@@ -338,8 +339,6 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   // console.log(curCve);
   const sendTextMsg = async (text: string) => {
     const { data } = await im.createTextMessage(text);
-    // console.log(curCve);
-
     sendMsg(data, messageTypes.TEXTMESSAGE);
     reSet();
   };
