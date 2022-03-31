@@ -71,7 +71,7 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
 
   const searchTemplate = (value: string, fields: string[], origin: any[]) => {
     // @ts-ignore
-    const filterArr = origin.filter((o) => fields.find((field) => o[field].includes(value)));
+    const filterArr = origin.filter((o) => fields.find((field) => o[field] && o[field].includes(value)));
     setContacts(filterArr);
   };
 
@@ -155,7 +155,7 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
         const hasMore = originList.current < originList.id.length;
         return (
           <ContactList
-            hasMore={hasMore}
+            hasMore={searchFlag ? false : hasMore}
             length={originList.current}
             fetchMoreData={fetchMoreRegisters}
             clickItem={clickListItem}
@@ -171,7 +171,7 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
       case 6:
       case 7:
       case 8:
-        return <Organizational selfDepartment= {menu.title} />;
+        return <Organizational selfDepartment={menu.title} />;
       default:
         return null;
     }

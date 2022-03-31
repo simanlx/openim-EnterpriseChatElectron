@@ -66,7 +66,7 @@ export const minioUpload = (uploadData: UploadRequestOption, fileType: minioUplo
     baseURL: getAdminUrl(),
     headers: {
       "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>",
-      token:localStorage.getItem("IMAdminToken")
+      token:localStorage.getItem("improfile")
     },
   });
 };

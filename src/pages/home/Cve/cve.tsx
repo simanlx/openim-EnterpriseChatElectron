@@ -151,11 +151,8 @@ const Home = () => {
 
   const groupMsgHandler = (data: any) => {
     const val = JSON.parse(data.data)
-    console.log(curCve?.groupID,val)
-    console.log(curCve)
     val.forEach((obj: any) => {
       if (obj.groupID === curCve?.groupID) {
-        // console.log(obj.msgIDList)
         rs.historyMsgList.forEach(item => {
           
           if (item.clientMsgID === obj.msgIDList[0]) {

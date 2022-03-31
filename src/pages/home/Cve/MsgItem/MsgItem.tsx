@@ -25,7 +25,16 @@ type MsgItemProps = {
   mutilSelect?: boolean;
 };
 
-const canSelectTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE, messageTypes.PICTUREMESSAGE,messageTypes.VIDEOMESSAGE,messageTypes.VOICEMESSAGE, messageTypes.CARDMESSAGE,messageTypes.FILEMESSAGE,messageTypes.LOCATIONMESSAGE];
+const canSelectTypes = [
+  messageTypes.TEXTMESSAGE,
+  messageTypes.ATTEXTMESSAGE,
+  messageTypes.PICTUREMESSAGE,
+  messageTypes.VIDEOMESSAGE,
+  messageTypes.VOICEMESSAGE,
+  messageTypes.CARDMESSAGE,
+  messageTypes.FILEMESSAGE,
+  messageTypes.LOCATIONMESSAGE,
+];
 
 const MsgItem: FC<MsgItemProps> = (props) => {
   const { msg, selfID, curCve, mutilSelect, audio } = props;
@@ -35,34 +44,43 @@ const MsgItem: FC<MsgItemProps> = (props) => {
   const msgItemRef = useRef<HTMLDivElement>(null);
   const [inViewport] = useInViewport(msgItemRef);
   const { t } = useTranslation();
-  const [unreadCardShow, setUnreadCardShow] = useState<boolean>(false)
-  const groupMemberList = useSelector((state:RootState) => state.contacts.groupMemberList, shallowEqual)
-  const groupMemberStatus = useSelector((state:RootState) => state.contacts.member2status, shallowEqual)
-  const curUser = JSON.parse(localStorage.getItem('lastimuid')!)
-  // const [newUnreadMember, setNewUnreadMember] = useState<number>()
+  const [unreadCardShow, setUnreadCardShow] = useState<boolean>(false);
+  const groupMemberList = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
+  const groupMemberStatus = useSelector((state: RootState) => state.contacts.member2status, shallowEqual);
+  const [greadInfo, setGreadInfo] = useState<{
+    groupMemberTotal: number;
+    readMemberList: GroupMemberItem[];
+    unReadMemberList: GroupMemberItem[];
+  }>({
+    groupMemberTotal: 0,
+    readMemberList: [],
+    unReadMemberList: [],
+  });
 
-  let groupMemberTotal:number = -1
+  const readMembers = msg.attachedInfoElem.groupHasReadInfo && msg.attachedInfoElem.groupHasReadInfo.hasReadCount;
 
-  groupMemberList.forEach(item => {
-    groupMemberTotal += 1
-  })
+  useEffect(() => {
+    let tmpGroupMemberTotal = -1
+    groupMemberList.forEach(() => {
+      tmpGroupMemberTotal += 1;
+    });
+    const tmpReadMemberList = groupMemberList?.filter((item) => {
+      if (msg.attachedInfoElem.groupHasReadInfo.hasReadUserIDList?.includes(item.userID)) {
+        return item;
+      }
+    });
 
-
-  const readMembers = msg.attachedInfoElem.groupHasReadInfo.hasReadCount
-
-
-  
-  const readMemberList = groupMemberList?.map(item => {
-    if (msg.attachedInfoElem.groupHasReadInfo.hasReadUserIDList?.includes(item.userID)) {
-      return item
-    }
-  })
-
-  const unReadMemberList = groupMemberList?.map(item => {
-    if (!msg.attachedInfoElem.groupHasReadInfo.hasReadUserIDList?.includes(item.userID) && item.userID !== String(curUser)) {
-      return item
-    }
-  })
+    const tmpUnReadMemberList = groupMemberList?.filter((item) => {
+      if (!msg.attachedInfoElem.groupHasReadInfo.hasReadUserIDList?.includes(item.userID) && item.userID !== selfID) {
+        return item;
+      }
+    });
+    setGreadInfo({
+      groupMemberTotal: tmpGroupMemberTotal,
+      readMemberList: tmpReadMemberList,
+      unReadMemberList: tmpUnReadMemberList,
+    });
+  }, [groupMemberList]);
 
   useEffect(() => {
     if (lastChange) {
@@ -74,14 +92,10 @@ const MsgItem: FC<MsgItemProps> = (props) => {
     if (inViewport && curCve.userID === msg.sendID && !msg.isRead) {
       markC2CHasRead(msg.sendID, msg.clientMsgID);
     }
-    if (inViewport && curCve.groupID === msg.groupID && curCve.groupID !== '' && !msg.isRead && msg.sendID !== selfID) {
-      markGroupC2CHasRead()
+    if (inViewport && curCve.groupID === msg.groupID && curCve.groupID !== "" && !msg.isRead && msg.sendID !== selfID) {
+      markGroupC2CHasRead();
     }
   }, [inViewport, curCve, selfID]);
-
-  // useEffect(() => {
-  //   console.log(msg.attachedInfoElem.groupHasReadInfo.hasReadCount)
-  // },[])
 
   const isSelf = (sendID: string): boolean => {
     return selfID === sendID;
@@ -100,7 +114,7 @@ const MsgItem: FC<MsgItemProps> = (props) => {
         });
         return `${str.slice(0, -1)} ${t("Online")}`;
       default:
-        return ''
+        return "";
     }
   };
 
@@ -110,8 +124,8 @@ const MsgItem: FC<MsgItemProps> = (props) => {
   };
 
   const markGroupC2CHasRead = () => {
-    im.markGroupMessageAsRead({groupID: curCve.groupID ,msgIDList: [msg.clientMsgID]})
-  }
+    im.markGroupMessageAsRead({ groupID: curCve.groupID, msgIDList: [msg.clientMsgID] });
+  };
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -128,7 +142,7 @@ const MsgItem: FC<MsgItemProps> = (props) => {
         }
         return null;
       case 3:
-        return <ExclamationCircleFilled style={{ color: "#f34037", fontSize: "20px" }}  onClick={() => console.log(888)} />;
+        return <ExclamationCircleFilled style={{ color: "#f34037", fontSize: "20px" }} onClick={() => console.log(888)} />;
       default:
         break;
     }
@@ -165,65 +179,63 @@ const MsgItem: FC<MsgItemProps> = (props) => {
   });
 
   const handleUnreadVisibleChange = (val: boolean) => {
-    setUnreadCardShow(val)
-  }
+    setUnreadCardShow(val);
+  };
 
   const offCard = () => {
-    setUnreadCardShow(false)
-  }
+    setUnreadCardShow(false);
+  };
 
   const UnReadContent = (
     <div className="unReadContent">
       <div className="title">
-          <span>{t('MessageRecipientList')}</span>
-          <span onClick={offCard}></span>
+        <span>{t("MessageRecipientList")}</span>
+        <span onClick={offCard}></span>
       </div>
       <div className="content">
         <div className="left">
-          <span className="tip">{readMembers}</span>{t('PeopleReaded')}
+          <span className="tip">{readMembers}</span>
+          {t("PeopleReaded")}
           <div className="list">
-            {
-              readMemberList.map((item, index) => {
-                if(item) {
-                  const curMember = groupMemberStatus[item.userID]
-                  return (
-                    <div className="list_item" key={index}>
-                      <MyAvatar src={item.faceURL} size={38} />
-                      <div className="info">
-                        <span>{item.nickname}</span>
-                        <span>[{switchOnline(curMember?.status, curMember?.detailPlatformStatus)}]</span>
-                      </div>
+            {greadInfo.readMemberList.map((item, index) => {
+              if (item) {
+                const curMember = groupMemberStatus[item.userID];
+                return (
+                  <div className="list_item" key={index}>
+                    <MyAvatar src={item.faceURL} size={38} />
+                    <div className="info">
+                      <span>{item.nickname}</span>
+                      <span>[{switchOnline(curMember?.status, curMember?.detailPlatformStatus)}]</span>
                     </div>
-                  )
-                }
-              })
-            }
+                  </div>
+                );
+              }
+            })}
           </div>
         </div>
         <div className="right">
-          <span className="tip">{groupMemberTotal - readMembers}</span>{t('PeopleUnRead')}
+          <span className="tip">{greadInfo.groupMemberTotal - readMembers}</span>
+          {t("PeopleUnRead")}
           <div className="list">
-            {
-              unReadMemberList.map((item, index) => {
-                if(item) {
-                  const curMember = groupMemberStatus[item.userID]
-                  return (
-                    <div className="list_item" key={index}>
-                      <MyAvatar src={item.faceURL} size={38} />
-                      <div className="info">
-                        <span>{item.nickname}</span>
-                        <span>[{switchOnline(curMember?.status, curMember?.detailPlatformStatus)}]</span>
-                      </div>
+            {greadInfo.unReadMemberList.map((item, index) => {
+              if (item) {
+                const curMember = groupMemberStatus[item.userID];
+                return (
+                  <div className="list_item" key={index}>
+                    <MyAvatar src={item.faceURL} size={38} />
+                    <div className="info">
+                      <span>{item.nickname}</span>
+                      <span>[{switchOnline(curMember?.status, curMember?.detailPlatformStatus)}]</span>
                     </div>
-                  )
-                }
-              })
-            }
+                  </div>
+                );
+              }
+            })}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <div ref={msgItemRef} onClick={mutilCheckItem} className={`chat_bg_msg ${isSelf(msg.sendID) ? "chat_bg_omsg" : ""}`}>
@@ -246,42 +258,37 @@ const MsgItem: FC<MsgItemProps> = (props) => {
         </MsgMenu>
       </div>
 
-      {isSelf(msg.sendID)
-      ? msg.status === 2 
-        ? (
-          <div style={{ color: "#428BE5", fontSize: '12px'}} className="chat_bg_flag_read">
-            {
-              curCve && isSingleCve(curCve)
-              ? <div>{switchTip()}</div>
-              : <div className="group_UnRead">
-                  {/* <Dropdown overlay={UnReadContent} placement="topRight" trigger={['click']}>
+      {isSelf(msg.sendID) ? (
+        msg.status === 2 ? (
+          <div style={{ color: "#428BE5", fontSize: "12px" }} className="chat_bg_flag_read">
+            {curCve && isSingleCve(curCve) ? (
+              <div>{switchTip()}</div>
+            ) : (
+              <div className="group_UnRead">
+                {/* <Dropdown overlay={UnReadContent} placement="topRight" trigger={['click']}>
                     <div onClick={() => {}}>
                       {`85${t('PeopleUnRead')}`}
                     </div>
                   </Dropdown> */}
-                  <Popover
+                <Popover
                   content={UnReadContent}
                   trigger="click"
                   overlayClassName="unread_card"
                   placement="topRight"
                   onVisibleChange={handleUnreadVisibleChange}
                   visible={unreadCardShow}
-                  >
-                    {
-                      groupMemberTotal - readMembers !== 0
-                      ? groupMemberTotal - readMembers + t('PeopleUnRead')
-                      : t('AllReaded')
-                    }
-                  </Popover>
-                </div>
-            }
+                >
+                  {greadInfo.groupMemberTotal - readMembers !== 0 ? greadInfo.groupMemberTotal - readMembers + t("PeopleUnRead") : t("AllReaded")}
+                </Popover>
+              </div>
+            )}
           </div>
-        )
-        : <div style={{ color: msg.isRead ? "#999" : "#428BE5", marginTop: curCve && isSingleCve(curCve) ? "0" : "24px" ,fontSize: '12px'}} className="chat_bg_flag">
+        ) : (
+          <div style={{ color: msg.isRead ? "#999" : "#428BE5", marginTop: curCve && isSingleCve(curCve) ? "0" : "24px", fontSize: "12px" }} className="chat_bg_flag">
             {switchTip()}
           </div>
-      : null}
-
+        )
+      ) : null}
     </div>
   );
 };

@@ -428,6 +428,8 @@ export const findEmptyValue = (obj: any) => {
 };
 
 export const pySegSort = (data: any[], key: string = "nickname") => {
+  console.log(data);
+  
   const ucfirst = (l1: any) => {
     if (l1.length > 0) {
       var first = l1.substr(0, 1).toUpperCase();
@@ -447,6 +449,7 @@ export const pySegSort = (data: any[], key: string = "nickname") => {
   };
 
   const codefans = (l1: any) => {
+    l1=l1??"unkown"
     var l2 = l1.length;
     var I1 = "";
     var reg = new RegExp("[a-zA-Z0-9- ]");
@@ -833,7 +836,7 @@ export const watermark = (config: WaterMarkConfig) => {
   }
 };
 
-export const switchUpload = async (uploadData: UploadRequestOption, fileType: minioUploadType = minioUploadType.picture, isNomal: boolean = false, snapShot?: RcFile) => {
+export const switchUpload = async (uploadData: UploadRequestOption, fileType: minioUploadType = minioUploadType.file, isNomal: boolean = false, snapShot?: RcFile) => {
   if (OBJECTSTORAGE === "minio") {
     return minioUpload(isNomal ? { file: uploadData } as any : uploadData, fileType);
   } else {
