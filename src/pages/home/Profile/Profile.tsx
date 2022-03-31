@@ -1,12 +1,12 @@
 import { shallowEqual } from "@babel/types";
-import { Button, Empty, Layout, message, Radio, RadioChangeEvent } from "antd";
+import { Button, Empty, Layout, message, Modal, Radio, RadioChangeEvent } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { MyAvatar } from "../../../components/MyAvatar";
-import { ANTDLOCALCHANGE } from "../../../constants/events";
+import { ANTDLOCALCHANGE, DELETEMESSAGE } from "../../../constants/events";
 import { RootState } from "../../../store";
 import { events, im } from "../../../utils";
 
@@ -88,6 +88,39 @@ const Profile = () => {
   const type = (useLocation().state as any).type ?? "about";
   const [curMenu, setCurMenu] = useState("");
   const { t } = useTranslation();
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
+
+  const ClearChart = () => {
+    return (
+      <Modal
+      className="delCve_modal"
+      visible={isModalVisible}
+      footer={null}
+      onCancel={() => setIsModalVisible(false)}
+      closable= {false}
+      centered
+      >
+        <div className="delCve_box">
+          <p className="delCve_box_text" onClick={delLocalRecord}>删除本地记录</p>
+          <p className="delCve_box_text" onClick={delRemoteRecord}>删除远程记录</p>
+        </div>
+      </Modal>
+    )
+  }
+
+  const delLocalRecord = () => {
+    im.deleteAllMsgFromLocal()
+    .then((res) => message.success(t("DeleteMessageSuc")))
+    .catch((err) => message.error(t("DeleteMessageFailed")));
+    setIsModalVisible(false)
+  }
+
+  const delRemoteRecord = () => {
+    im.deleteAllMsgFromLocalAndSvr()
+    .then((res) => message.success(t("DeleteMessageSuc")))
+    .catch((err) => message.error(t("DeleteMessageFailed")));
+    setIsModalVisible(false)
+  }
 
   const aboutMenus = [
     {
@@ -121,6 +154,10 @@ const Profile = () => {
       title: t("Blacklist"),
       idx: 1,
     },
+    {
+      title: t("ClearChat"),
+      idx: 2,
+    },
   ];
 
   const clickMenu = (idx: number) => {
@@ -135,6 +172,12 @@ const Profile = () => {
           setCurMenu("bl");
         }
         break;
+      case 2:
+        if (type === "set") {
+          setCurMenu("cc");
+          setIsModalVisible(true)
+        }
+        break;
       default:
         setCurMenu("");
         break;
@@ -147,6 +190,9 @@ const Profile = () => {
         return <Blacklist />;
       case "ps":
         return <PersonalSetting />;
+      case "cc":
+        return <ClearChart />;
+
       default:
         return <div>...</div>;
     }

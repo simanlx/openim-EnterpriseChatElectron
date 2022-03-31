@@ -53,12 +53,13 @@ export const parseMessageType = (pmsg: MessageItem, curUid?: string): string => 
       const groupCreatedUser = groupCreatedDetail.opUser;
       return `${isSelf(groupCreatedUser.userID) ? t("You") : groupCreatedUser.nickname}${t("GroupCreated")}`;
     case tipsTypes.MEMBERINVITED:
-      const inviteDetails = JSON.parse(pmsg.notificationElem.detail);
-      const inviteOpUser = inviteDetails.opUser;
-      const invitedUserList = inviteDetails.invitedUserList ?? [];
-      let inviteStr = "";
-      invitedUserList.forEach((user: any) => (inviteStr += (isSelf(user.userID) ? t("You") : user.nickname) + " "));
-      return `${isSelf(inviteOpUser.userID) ? t("You") : inviteOpUser.nickname}${t("Invited")}${inviteStr}${t("IntoGroup")}`;
+      // const inviteDetails = JSON.parse(pmsg.notificationElem.detail);
+      // const inviteOpUser = inviteDetails.opUser;
+      // const invitedUserList = inviteDetails.invitedUserList ?? [];
+      // let inviteStr = "";
+      // invitedUserList.forEach((user: any) => (inviteStr += (isSelf(user.userID) ? t("You") : user.nickname) + " "));
+      // return `${isSelf(inviteOpUser.userID) ? t("You") : inviteOpUser.nickname}${t("Invited")}${inviteStr}${t("IntoGroup")}`;
+      return ''
     case tipsTypes.MEMBERKICKED:
       const kickDetails = JSON.parse(pmsg.notificationElem.detail);
       const kickOpUser = kickDetails.opUser;

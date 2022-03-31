@@ -259,11 +259,15 @@ const Home = () => {
     dispatch(setCurCve(null));
   };
 
-  const deleteMsg = (mid: string) => {
-    const idx = rs.historyMsgList.findIndex((h) => h.clientMsgID === mid);
-    let tmpList = [...rs.historyMsgList];
-    tmpList.splice(idx, 1);
-    rs.historyMsgList = tmpList;
+  const deleteMsg = (mid: string, isCid?: boolean) => {
+    if (isCid) {
+      rs.historyMsgList = []
+    } else {
+      const idx = rs.historyMsgList.findIndex((h) => h.clientMsgID === mid);
+      let tmpList = [...rs.historyMsgList];
+      tmpList.splice(idx, 1);
+      rs.historyMsgList = tmpList;
+    }
     message.success(t("DeleteMessageSuc"));
   };
 

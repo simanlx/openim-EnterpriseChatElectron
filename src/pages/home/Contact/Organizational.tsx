@@ -45,6 +45,7 @@ const [naviItem, setNaviItem] = useState<NaviItemProps[]>([])
     .then(data => {
       setInitStorage(data.data)
       setDepartmentList(data.data)
+      console.log(data)
     })
     .catch(data => {
       message.error('Server error')
@@ -124,7 +125,9 @@ const [naviItem, setNaviItem] = useState<NaviItemProps[]>([])
     console.log('头像')
   }
 
-
+  const goChart = () => {
+    console.log('聊天')
+  }
 
   const initData = () => {
       // const data = await getDeptList()
@@ -157,7 +160,7 @@ const [naviItem, setNaviItem] = useState<NaviItemProps[]>([])
       {
         memberList.map((item, index) => {
           return (
-            <li key={index} onDoubleClick={() => {}}>
+            <li key={index} onDoubleClick={goChart}>
               <div onClick={() => handleMemberAva()}>
                 <MyAvatar src={''} size={38} />
               </div>

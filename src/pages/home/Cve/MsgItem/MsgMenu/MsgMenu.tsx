@@ -54,18 +54,6 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
       .catch((err) => message.error(t("RevokeMessageFailed")));
   };
 
-  // const delComfirm = () => {
-    // Modal.confirm({
-      // title: t("DeleteMessage"),
-      // content: t("DeleteMessageConfirm"),
-      // okButtonProps: {
-      //   type: "primary",
-      // },
-      // okType: "danger",
-      // onOk: delMsg,
-    // });
-  // };
-
   const delLocalRecord = () => {
     im.deleteMessageFromLocalStorage(JSON.stringify(msg))
     .then((res) => {
@@ -75,16 +63,12 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
   }
 
   const delRemoteRecord = () => {
-    
+    im.deleteMessageFromLocalAndSvr(JSON.stringify(msg))
+    .then((res) => {
+      events.emit(DELETEMESSAGE, msg.clientMsgID);
+    })
+    .catch((err) => message.error(t("DeleteMessageFailed")));
   }
-
-  // const delMsg = () => {
-  //   im.deleteMessageFromLocalStorage(JSON.stringify(msg))
-  //     .then((res) => {
-  //       events.emit(DELETEMESSAGE, msg.clientMsgID);
-  //     })
-  //     .catch((err) => message.error(t("DeleteMessageFailed")));
-  // };
 
   const downloadFile = () => {
     let downloadUrl = "";
@@ -116,7 +100,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
       return item.userID !== String(userId)
     })
     // console.log(emojiObj)
-    console.log(msg)
+    // console.log(msg)
     if(msg.contentType === messageTypes.PICTUREMESSAGE) {
       emojiObj[0].emoji = [
         {

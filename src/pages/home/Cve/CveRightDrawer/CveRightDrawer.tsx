@@ -1,7 +1,7 @@
 import { LeftOutlined } from "@ant-design/icons";
-import { Drawer, message } from "antd";
+import { Drawer, message, Modal } from "antd";
 import { FC, useEffect, useState } from "react";
-import { im, isSingleCve } from "../../../../utils";
+import { events, im, isSingleCve } from "../../../../utils";
 import SingleDrawer from "./SingleDrawer";
 import GroupDrawer from "./GroupDrawer/GroupDrawer";
 import EditDrawer from "./GroupDrawer/EditDrawer";
@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import { setCurCve } from "../../../../store/actions/cve";
 import { ConversationItem, GroupItem, GroupMemberItem, OptType } from "../../../../utils/open_im_sdk/types";
 import { SearchMessageDrawer } from "./SearchMessageDrawer";
+import delCart_icon from "../../../../assets/images/del_msg.png"
+import { DELETEMESSAGE } from "../../../../constants/events";
 
 type CveRightDrawerProps = {
   curCve: ConversationItem;
@@ -37,6 +39,7 @@ const CveRightDrawer: FC<CveRightDrawerProps> = ({ curCve, visible, curTool, onC
   const groupInfo = useSelector((state: RootState) => state.contacts.groupInfo, shallowEqual);
   const [adminList, setAdminList] = useState<GroupMemberItem[]>([]);
   const [role, setRole] = useState<GroupRole>(GroupRole.NOMAL);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -107,6 +110,32 @@ const CveRightDrawer: FC<CveRightDrawerProps> = ({ curCve, visible, curTool, onC
     });
   };
 
+  const delLocalRecord = () => {
+    if (curCve.conversationType === 1) {
+      im.clearC2CHistoryMessage(curCve.userID)
+      .then((res) => {
+        events.emit(DELETEMESSAGE, curCve.userID, true);
+      })
+      .catch((err) => message.error(t("DeleteMessageFailed")));
+    } else {
+      im.clearGroupHistoryMessage(curCve.groupID)
+      .then((res) => {
+        events.emit(DELETEMESSAGE, curCve.groupID, true);
+      })
+      .catch((err) => message.error(t("DeleteMessageFailed")));
+    }
+    setIsModalVisible(false)
+  }
+
+  const delRemoteRecord = () => {
+    im.deleteConversationMsgFromLocalAndSvr(curCve.conversationID)
+    .then((res) => {
+      events.emit(DELETEMESSAGE, curCve.conversationID, true);
+    })
+    .catch((err) => message.error(t("DeleteMessageFailed")));
+    setIsModalVisible(false)
+  }
+
   const switchContent = () => {
     switch (type) {
       case "set":
@@ -150,14 +179,15 @@ const CveRightDrawer: FC<CveRightDrawerProps> = ({ curCve, visible, curTool, onC
       case "group_notice_list":
         return <div>{t("GroupAnnouncement")}</div>;
       case "search_message":
-        return <div>{t("ChatsRecord")}</div>
+        return <div className="search_del">{t("ChatsRecord")}<img src={delCart_icon} alt='' onClick={() => setIsModalVisible(true)}/></div>
       default:
         break;
     }
   };
 
   return (
-    <Drawer
+    <>
+      <Drawer
       className="right_set_drawer"
       width={360}
       // mask={false}
@@ -171,9 +201,23 @@ const CveRightDrawer: FC<CveRightDrawerProps> = ({ curCve, visible, curTool, onC
       closable={type === "set" || type === "search_message"}
       visible={visible}
       getContainer={document.getElementById("chat_main")!}
-    >
-      {switchContent()}
-    </Drawer>
+      >
+        {switchContent()}
+      </Drawer>
+      <Modal
+      className="delCve_modal"
+      visible={isModalVisible}
+      footer={null}
+      onCancel={() => setIsModalVisible(false)}
+      closable= {false}
+      centered
+      >
+        <div className="delCve_box">
+          <p className="delCve_box_text" onClick={delLocalRecord}>删除本地记录</p>
+          <p className="delCve_box_text" onClick={delRemoteRecord}>删除远程记录</p>
+        </div>
+      </Modal>
+    </>
   );
 };
 

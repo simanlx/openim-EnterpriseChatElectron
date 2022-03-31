@@ -25,6 +25,8 @@ enum RequestFunc {
     DELETEMESSAGEFROMLOCALSTORAGE="DeleteMessageFromLocalStorage",
     DELETEMESSAGEFROMLOCALANDSVR="DeleteMessageFromLocalAndSvr",
     DELETECONVERSATIONMSGFROMLOCALANDSVR="DeleteConversationMsgFromLocalAndSvr",
+    DELETEALLMSGFROMLOCALANDSVR="DeleteAllMsgFromLocalAndSvr",
+    DELETEALLMSGFROMLOCAL="DeleteAllMsgFromLocal",
     MARKSINGLEMESSAGEHASREAD="MarkSingleMessageHasRead",
     INSERTSINGLEMESSAGETOLOCALSTORAGE="InsertSingleMessageToLocalStorage",
     INSERTGROUPMESSAGETOLOCALSTORAGE="InsertGroupMessageToLocalStorage",
