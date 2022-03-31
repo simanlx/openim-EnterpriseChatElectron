@@ -1,5 +1,5 @@
 import { UserOutlined } from "@ant-design/icons";
-import { message, Popover, Badge, Skeleton } from "antd";
+import { message, Popover, Badge, Skeleton, Modal } from "antd";
 import { FC, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
@@ -111,7 +111,8 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
     : parseLatestMsg(cve.latestMsg);
 
   return (
-    <Popover
+    <>
+      <Popover
       visible={popVis}
       onVisibleChange={(v) => setPopVis(v)}
       placement="bottomRight"
@@ -120,22 +121,23 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
       content={PopContent}
       title={null}
       trigger="contextMenu"
-    >
-      <div ref={itemRef} onClick={() => onClick(cve)} className={`cve_item ${curCve?.conversationID === cve.conversationID || cve.isPinned ? "cve_item_focus" : ""}`}>
-        <LayLoad forceLoad={idx < 15} targetRef={itemRef} skeletonCmp={<Skeleton.Avatar active={true} size={36} shape="square" />}>
-          <Badge size="small" dot={!isRecv(cve?.recvMsgOpt) && cve.unreadCount > 0} count={isRecv(cve?.recvMsgOpt) ? cve.unreadCount : null}>
-            <MyAvatar shape="square" style={{ minWidth: "36px" }} size={36} icon={<UserOutlined />} src={cve.faceURL} />
-          </Badge>
-        </LayLoad>
+      >
+        <div ref={itemRef} onClick={() => onClick(cve)} className={`cve_item ${curCve?.conversationID === cve.conversationID || cve.isPinned ? "cve_item_focus" : ""}`}>
+          <LayLoad forceLoad={idx < 15} targetRef={itemRef} skeletonCmp={<Skeleton.Avatar active={true} size={36} shape="square" />}>
+            <Badge size="small" dot={!isRecv(cve?.recvMsgOpt) && cve.unreadCount > 0} count={isRecv(cve?.recvMsgOpt) ? cve.unreadCount : null}>
+              <MyAvatar shape="square" style={{ minWidth: "36px" }} size={36} icon={<UserOutlined />} src={cve.faceURL} />
+            </Badge>
+          </LayLoad>
 
-        <div className="cve_info">
-          <div data-time={parseLatestTime(cve.latestMsgSendTime)} className="cve_title">
-            {cve.showName}
+          <div className="cve_info">
+            <div data-time={parseLatestTime(cve.latestMsgSendTime)} className="cve_title">
+              {cve.showName}
+            </div>
+            <div className={`cve_msg ${isRecv(cve?.recvMsgOpt) ? "" : "cve_msg_opt"}`} dangerouslySetInnerHTML={{ __html: parseLastMessage }}></div>
           </div>
-          <div className={`cve_msg ${isRecv(cve?.recvMsgOpt) ? "" : "cve_msg_opt"}`} dangerouslySetInnerHTML={{ __html: parseLastMessage }}></div>
         </div>
-      </div>
-    </Popover>
+      </Popover>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import { message, Modal, Popover } from "antd";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 
 import ts_msg from "@/assets/images/ts_msg.png";
 import re_msg from "@/assets/images/re_msg.png";
@@ -32,6 +32,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
   const { t } = useTranslation();
   // const canHiddenTypes = [t("Copy"), t("Translate"), t("Reply"), t("Forward")];
   const canHiddenTypes = [t("Copy"), t("Translate"), t("Reply")];
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
 
   const forwardMsg = () => {
     events.emit(FORWARDANDMERMSG, "forward", JSON.stringify(msg));
@@ -53,25 +54,37 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
       .catch((err) => message.error(t("RevokeMessageFailed")));
   };
 
-  const delComfirm = () => {
-    Modal.confirm({
-      title: t("DeleteMessage"),
-      content: t("DeleteMessageConfirm"),
-      okButtonProps: {
-        type: "primary",
-      },
-      okType: "danger",
-      onOk: delMsg,
-    });
-  };
+  // const delComfirm = () => {
+    // Modal.confirm({
+      // title: t("DeleteMessage"),
+      // content: t("DeleteMessageConfirm"),
+      // okButtonProps: {
+      //   type: "primary",
+      // },
+      // okType: "danger",
+      // onOk: delMsg,
+    // });
+  // };
 
-  const delMsg = () => {
+  const delLocalRecord = () => {
     im.deleteMessageFromLocalStorage(JSON.stringify(msg))
-      .then((res) => {
-        events.emit(DELETEMESSAGE, msg.clientMsgID);
-      })
-      .catch((err) => message.error(t("DeleteMessageFailed")));
-  };
+    .then((res) => {
+      events.emit(DELETEMESSAGE, msg.clientMsgID);
+    })
+    .catch((err) => message.error(t("DeleteMessageFailed")));
+  }
+
+  const delRemoteRecord = () => {
+    
+  }
+
+  // const delMsg = () => {
+  //   im.deleteMessageFromLocalStorage(JSON.stringify(msg))
+  //     .then((res) => {
+  //       events.emit(DELETEMESSAGE, msg.clientMsgID);
+  //     })
+  //     .catch((err) => message.error(t("DeleteMessageFailed")));
+  // };
 
   const downloadFile = () => {
     let downloadUrl = "";
@@ -177,7 +190,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
     {
       title: t("Delete"),
       icon: del_msg,
-      method: delComfirm,
+      method: () => setIsModalVisible(true),
       hidden: false,
     },
     {
@@ -224,9 +237,24 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
   };
 
   return (
-    <Popover  onVisibleChange={(v) => visibleChange(v)} overlayClassName="msg_item_menu" content={PopContent} title={null} trigger="contextMenu" visible={visible}>
-      <div>{children}</div>
-    </Popover>
+    <>
+      <Popover  onVisibleChange={(v) => visibleChange(v)} overlayClassName="msg_item_menu" content={PopContent} title={null} trigger="contextMenu" visible={visible}>
+        <div>{children}</div>
+      </Popover>
+      <Modal 
+      className="delCve_modal"
+      visible={isModalVisible}
+      footer={null}
+      onCancel={() => setIsModalVisible(false)}
+      closable= {false}
+      centered
+      >
+        <div className="delCve_box">
+          <p className="delCve_box_text" onClick={delLocalRecord}>删除本地记录</p>
+          <p className="delCve_box_text" onClick={delRemoteRecord}>删除远程记录</p>
+        </div>
+      </Modal>
+    </>
   );
 };
 

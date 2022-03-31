@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { debounce } from "throttle-debounce";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { SessionType } from "../../../../constants/messageContentType";
-import { formatDate, im, s_to_hs } from "../../../../utils";
+import { bytesToSize, downloadFileUtil, formatDate, im, switchFileIcon, s_to_hs } from "../../../../utils";
 import { ConversationItem } from "../../../../utils/open_im_sdk/types";
 import styles from "../../../../components/SearchBar/index.module.less";
 import file_zip from '../../../../assets/images/file_zip.png'
@@ -34,6 +34,8 @@ type FileContentProps = {
   size: string;
   senderNickname: string;
   time: string;
+  type: string;
+  filePath: string;
 }
 
 export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) => {
@@ -94,7 +96,6 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
             return false
           }
           const videoData = haveData.map((item: any) => {
-            console.log(s_to_hs(item.videoElem.duration))
             return {
               url: item.videoElem.snapshotPath,
               duration: s_to_hs(item.videoElem.duration)
@@ -103,7 +104,23 @@ export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) =>
           setVideoContent(videoData)
           break;
         case 105:
-          console.log(type)
+          if (!haveData) {
+            setFileContent([])
+            return false
+          }
+          const fileData = haveData.map((item: any) => {
+            const filesuffix = (item.fileElem.fileName).split('.')
+            const type = switchFileIcon(filesuffix[filesuffix.length -1])
+            return {
+              name: item.fileElem.fileName,
+              size: bytesToSize(item.fileElem.fileSize),
+              senderNickname: item.senderNickname,
+              time:  formatDate(item.createTime)[3] + ' ' + formatDate(item.createTime)[4],
+              type,
+              filePath: item.fileElem.filePath
+            }
+          })
+          setFileContent(fileData)
           break;
         default:
           if (!haveData) {
@@ -321,7 +338,7 @@ const VideoMessageList = ({videoContent}: any) => {
                   />
                   <div className="title">
                     <span></span>
-                    <span>5:20</span>
+                    <span>{item.duration}</span>
                   </div>
                 </div>
               })
@@ -356,8 +373,8 @@ const VideoMessageList = ({videoContent}: any) => {
   </div>
 }
 
-const downloadFile = () => {
-  console.log("下载文件")
+const downloadFile = (path: string, name: string) => {
+  downloadFileUtil(path, name)
 }
 
 const FileMessageList = ({fileContent}: any) => {
@@ -370,18 +387,29 @@ const FileMessageList = ({fileContent}: any) => {
           fileContent.map((item: FileContentProps, index: number) => {
             return  <li key={index}>
               <div className="box">
-                <img src={file_zip} alt="" style={{width: '38px',height:'44px'}}/>
+                <img src={item.type} alt="" style={{width: '38px',height:'44px'}}/>
                 <div className="info">
                   <div className="title">
-                    <span>文件.zip</span>
+                    <Text
+                      style={{maxWidth: "200px"}}
+                      ellipsis={{ tooltip: item.name }}
+                    >
+                      {item.name}
+                    </Text>
                   </div>
                   <div className="content">
-                    <span>10KB&nbsp;&nbsp;</span>
-                    <span>发送者&nbsp;&nbsp;5:20</span>
+                    <span>{item.size}&nbsp;&nbsp;</span>
+                    <Text
+                      style={{maxWidth: "100px"}}
+                      ellipsis={{ tooltip: item.senderNickname }}
+                    >
+                      {item.senderNickname}
+                    </Text>
+                    <span>&nbsp;&nbsp;{item.time}</span>
                   </div>
                 </div>
               </div>
-              <span className="download" onClick={() => downloadFile()}></span>
+              <span className="download" onClick={() => downloadFile(item.filePath, item.name)}></span>
             </li>
           })
         }

@@ -70,20 +70,20 @@ const Contacts = () => {
       idx: 6,
       suffix: "os",
     },
-    {
-      title: '技术部',
-      icon: department_icon,
-      bgc: "",
-      idx: 7,
-      suffix: "js",
-    },
-    {
-      title: '体验部',
-      icon: department_icon,
-      bgc: "",
-      idx: 8,
-      suffix: "ty",
-    },
+    // {
+    //   title: '技术部',
+    //   icon: department_icon,
+    //   bgc: "",
+    //   idx: 7,
+    //   suffix: "js",
+    // },
+    // {
+    //   title: '体验部',
+    //   icon: department_icon,
+    //   bgc: "",
+    //   idx: 8,
+    //   suffix: "ty",
+    // },
   ]
   const [menu, setMenu] = useState(consMenuList[3]);
   const ref = useRef<ContactContentHandler>(null);
