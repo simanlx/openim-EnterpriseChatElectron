@@ -477,6 +477,19 @@ export default class OpenIMSDK extends Emitter {
     });
   };
 
+  deleteMessageFromLocalAndSvr = (data: string, operationID?: string) => {
+    return new Promise<WsResponse>((resolve, reject) => {
+      const _uuid = operationID || uuid(this.uid as string);
+      const args = {
+        reqFuncName: RequestFunc.DELETEMESSAGEFROMLOCALANDSVR,
+        operationID: _uuid,
+        userID: this.uid,
+        data,
+      };
+      this.wsSend(args, resolve, reject);
+    });
+  };
+
   markGroupMessageHasRead = (data: string, operationID?: string) => {
     return new Promise<WsResponse>((resolve, reject) => {
       const _uuid = operationID || uuid(this.uid as string);
